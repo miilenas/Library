@@ -1,0 +1,30 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+ <ion-item>
+    <ion-input label="First name" type="text" placeholder="Enter email" [(ngModel)]="firstName"></ion-input>
+  </ion-item>
+   <ion-item>
+    <ion-input label="l" type="text" placeholder="Enter email" [(ngModel)]="lastName"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input label="Email" type="email" placeholder="Enter email" [(ngModel)]="email"></ion-input>
+  </ion-item>
+
+  <ion-item class="ion-margin-top">
+    <ion-input label="Password" type="password" placeholder="Enter password" [(ngModel)]="password"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" class="ion-margin-top" (click)="register()">Login</ion-button>
+
+  <ion-button expand="block" fill="clear" class="ion-margin-top" routerLink="/register">Don't have an account? Register </ion-button>
+
+  <ion-text color="danger" *ngIf="errorMessage" class="ion-padding-top">
+    <p>{{ errorMessage }}</p>
+  </ion-text>
+
+</ion-content>
