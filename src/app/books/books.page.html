@@ -1,13 +1,41 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>books</ion-title>
+    <ion-title>Books you may like</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">books</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <ion-button (click)="openAddBookDialog()">Add New Book</ion-button>
+
+ <ng-container *ngIf="books$ | async as books; else loading">
+    
+    <ng-container *ngIf="books.length > 0; else noBooksTemplate">
+      <ion-card *ngFor="let book of books">
+     <ion-card-header>
+          <ion-card-title>{{ book.Title }}</ion-card-title>
+          <ion-card-subtitle>{{ book.Author }} — {{ book.PublishedYear }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          {{ book.Description }}
+        </ion-card-content>
+        <ion-button fill="clear" (click)="addBookToReadings(book.Id)" aria-label="Add to Readings">
+        <ion-icon slot="icon-only" name="heart-outline" size="large"></ion-icon>
+        </ion-button>
+
+      
+      </ion-card>
+    </ng-container>
+
+  </ng-container>
+
+  <ng-template #loading>
+    <ion-spinner name="crescent"></ion-spinner>
+  </ng-template>
+
+  <ng-template #noBooksTemplate>
+    <ion-text color="medium" class="ion-text-center">
+      <p>No books available.</p>
+    </ion-text>
+  </ng-template>
+
 </ion-content>

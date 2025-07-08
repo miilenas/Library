@@ -21,7 +21,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/readings',
+        redirectTo: 'readings',
         pathMatch: 'full'
       }
     ]

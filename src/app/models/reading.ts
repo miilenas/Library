@@ -1,15 +1,15 @@
-export enum Status{
+export enum StatusEnum{
     WantToRead,
     Reading,
     Finished
 }
 export class Reading {
   constructor(
-    public id: string = "",
-    public userId: string  = "",
-    public bookId: string  = "",
-    public status: Status  = Status.WantToRead,
-    public grade: number  = 1,
-    public comment: string  = "",
+    public Id: string = "",
+    public UserId: string  = "",
+    public BookId: string  = "",
+    public Status: StatusEnum  = StatusEnum.WantToRead,
+    public Grade: number  = 1,
+    public Comment: string  = "",
   ) {}
 }

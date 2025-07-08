@@ -7,16 +7,26 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
 
-  user$: Observable<User | null>;
+  // user$: Observable<User | null>;
+
+  // constructor(private auth: Auth) {
+  //   this.user$ = new Observable<User | null>(observer => {
+  //     this.auth.onAuthStateChanged(user => {
+  //       observer.next(user);
+  //     });
+  //   });
+  // }
+
+   user$: Observable<User | null>;
 
   constructor(private auth: Auth) {
     this.user$ = new Observable<User | null>(observer => {
-      this.auth.onAuthStateChanged(user => {
+      const unsubscribe = this.auth.onAuthStateChanged(user => {
         observer.next(user);
       });
+      return { unsubscribe };
     });
   }
-
   /**
    * Registruje novog korisnika sa emailom i lozinkom.
    * @param email Email korisnika.
@@ -66,7 +76,14 @@ export class AuthService {
    * Dohvata UID trenutno prijavljenog korisnika.
    * @returns UID korisnika (string) ili null ako niko nije prijavljen.
    */
+  // getCurrentUserUid(): string | null {
+  //   return this.auth.currentUser ? this.auth.currentUser.uid : null;
+  // }
   getCurrentUserUid(): string | null {
-    return this.auth.currentUser ? this.auth.currentUser.uid : null;
-  }
+  let uid: string | null = null;
+  this.user$.subscribe(user => {
+    uid = user ? user.uid : null;
+  });
+  return uid;
+}
 }

@@ -1,6 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
+
+
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -13,37 +17,58 @@ export class LoginPage implements OnInit {
   password!: string;
   errorMessage: string | null = null;
 
-   private authService = inject(AuthService);
+  private authService = inject(AuthService);
   private router = inject(Router);
+  private toastController = inject(ToastController);
 
-  constructor() {
-    console.log("loginpage");
-   }
+
+  // constructor() {
+  //   console.log("loginpage");
+  //  }
 
   ngOnInit() {
   }
 
+async presentToast(message: string) {
+  const toast = await this.toastController.create({
+    message,
+    duration: 3000,
+    position: 'middle',
+    color: 'danger'
+  });
+  await toast.present();
+}
+
    async login() {
     this.errorMessage = null;
+
+      if (!this.email || !this.password) {
+     this.presentToast ('Email and password are required.');
+    return;
+    }
+
     try {
       await this.authService.login(this.email, this.password);
-      this.router.navigateByUrl('/readings', { replaceUrl: true }); 
+      this.router.navigateByUrl('/tabs/readings', { replaceUrl: true }); 
     } catch (error: any) {
-      console.error('Error to login:', error.code, error.message);
-      console.error(error);
+      // console.error('Error to login:', error.code, error.message);
+      // console.error(error);
       switch (error.code) {
         case 'auth/user-not-found':
         case 'auth/wrong-password':
-          this.errorMessage = 'Wrong email or password.';
+          this.presentToast ('Wrong email or password.');
           break;
+        case 'auth/invalid-credential':
+          this.presentToast('Invalid credentials.');
+          break;  
         case 'auth/invalid-email':
-          this.errorMessage = 'Invalid email format.';
+          this.presentToast('Invalid email format.') ;
           break;
         case 'auth/too-many-requests':
-          this.errorMessage = 'Too many tries. Please try later.';
+         this.presentToast ('Too many tries. Please try later.') ;
           break;
         default:
-          this.errorMessage = 'Unexpected error. Please try later.';
+          this.presentToast('Unexpected error. Please try later.');
       }
     }
   }

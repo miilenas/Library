@@ -1,13 +1,76 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>readings</ion-title>
+    <ion-title>My Readings</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">readings</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+
+  <ng-container *ngIf="books.length > 0; else noBooksTemplate">
+    <ion-card *ngFor="let book of books">
+      <ion-card-header>
+        <ion-card-title>{{ book.Title }}</ion-card-title>
+        <ion-card-subtitle>{{ book.Author }} — {{ book.PublishedYear }}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        {{ book.Description }}
+         <div>
+          <strong>Rating:</strong> {{ getRatingForBook(book.Id) }}
+          <ion-button (click)="openRatingDialog(book.Id)">Rate this book</ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <ng-template #noBooksTemplate>
+    <ion-text color="medium" class="ion-text-center">
+      <p>You have no books in your reading list.</p>
+    </ion-text>
+  </ng-template>
+
+</ion-content> -->
+
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>My Readings</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ng-container *ngIf="books.length > 0; else noBooksTemplate">
+    <ion-card *ngFor="let book of books">
+      <ion-card-header>
+        <ion-card-title>{{ book.Title }}</ion-card-title>
+        <ion-card-subtitle>{{ book.Author }} — {{ book.PublishedYear }}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        {{ book.Description }}
+
+        <!-- <ng-container *ngIf="myread.find(r => r.BookId === book.Id) as reading"> -->
+        <ng-container *ngFor="let reading of myread" >
+  <ng-container *ngIf="reading.BookId === book.Id">
+          <div *ngIf="reading.Status !== StatusEnum.Finished">
+            <ion-button size="small" (click)="openRatingDialog(book.Id)">Rate this book</ion-button>
+            <ion-button size="small" (click)="openCommentDialog(book.Id)">Leave a comment</ion-button>
+          </div>
+
+          <div *ngIf="reading.Status === StatusEnum.Finished">
+            <p><strong>Rating:</strong> {{ reading.Grade }}</p>
+            <p><strong>Comment:</strong> {{ reading.Comment }}</p>
+          </div>
+        </ng-container>
+        </ng-container>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <ng-template #noBooksTemplate>
+    <ion-text color="medium" class="ion-text-center">
+      <p>You have no books in your reading list.</p>
+    </ion-text>
+  </ng-template>
+
 </ion-content>
