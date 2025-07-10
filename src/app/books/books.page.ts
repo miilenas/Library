@@ -102,10 +102,13 @@ addNewBook(data: any) {
   this.booksService.addBook(newBook).subscribe({
     next: () => {
       console.log('Book added successfully');
-      this.books$ = this.booksService.getBooks(); // osveži listu
+      this.books$ = this.booksService.getBooks(); 
     },
     error: (err) => console.error('Error adding book:', err)
   });
+}
+isBookInReadings(bookId: string): boolean {
+  return this.readings.some(r => r.BookId === bookId);
 }
 
 

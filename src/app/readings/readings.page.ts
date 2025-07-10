@@ -5,7 +5,7 @@ import { Book } from '../models/book';
 import { Reading, StatusEnum } from '../models/reading';
 import { getAuth } from 'firebase/auth';
 import { combineLatest, switchMap } from 'rxjs';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-readings',
@@ -21,7 +21,8 @@ export class ReadingsPage implements OnInit {
   constructor(
     private readingService: ReadingService,
     private bookService: BooksService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private toastController: ToastController,
   ) {}
 
   ngOnInit() {
@@ -54,86 +55,77 @@ export class ReadingsPage implements OnInit {
     return reading ? reading.Grade : 0; 
   }
 
-  async openRatingDialog(bookId: string) {
-    const alert = await this.alertController.create({
-      header: 'Rate Book',
-      inputs: [
-        {
-          name: 'rating',
-          type: 'number',
-          placeholder: 'Enter your rating (1-5)',
-          min: 1,
-          max: 5
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
-          text: 'Submit',
-          handler: (data) => {
-            this.submitRating(bookId, data.rating);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  // submitRating(bookId: string, rating: number) {
-  //   const userId = getAuth().currentUser?.uid;
-  //   if (userId) {
-  //     this.readingService.updateRating(userId, bookId, rating).subscribe(() => {
-  //       console.log('Rating submitted:', rating);
-  //     });
-  //   }
-  // }
-  submitRating(bookId: string, rating: number) {
+deleteReading(bookId: string) {
   const userId = getAuth().currentUser?.uid;
-  if (userId) {
-    const reading = this.myread.find(r => r.BookId === bookId);
-    if (!reading) return;
+  if (!userId) return;
 
-    this.readingService.updateRating(userId, bookId, rating).subscribe(() => {
-      console.log('Rating submitted:', rating);
+  const reading = this.myread.find(r => r.BookId === bookId);
+  if (!reading) return;
 
-      if (reading.Comment && reading.Comment.trim() !== '') {
-        this.readingService.updateStatus(userId, bookId, StatusEnum.Finished).subscribe(() => {
-          console.log('Status updated to Finished');
-        });
+  this.readingService.deleteReading(reading.Id).subscribe({
+    next: () => {
+      console.log('Reading deleted');
+      this.myread = this.myread.filter(r => r.BookId !== bookId);
+      this.books = this.books.filter(b => b.Id !== bookId);
+    },
+    error: (err) => console.error('Error deleting reading', err)
+  });
+}
+getAlertButtons(bookId: string) {
+  return [
+    {
+      text: 'No',
+      role: 'cancel'
+    },
+    {
+      text: 'Yes',
+      handler: () => {
+        this.deleteReading(bookId);
       }
-    });
-  }
+    }
+  ];
 }
 
-
-submitComment(bookId: string, comment: string) {
-  const userId = getAuth().currentUser?.uid;
-  if (userId) {
-    this.readingService.updateComment(userId, bookId, comment).subscribe(() => {
-      console.log('Comment submitted:', comment);
-    });
-  }
+setResult(ev: any) {
+  console.log('Alert dismissed', ev);
 }
-async openCommentDialog(bookId: string) {
+async presentToast(message: string) {
+  const toast = await this.toastController.create({
+    message,
+    duration: 2000,
+    color: 'success',
+    position: 'bottom'
+  });
+
+  await toast.present();
+}
+
+async openImpressionDialog(bookId: string) {
+  const reading = this.myread.find(r => r.BookId === bookId);
+  if (!reading) return;
+
   const alert = await this.alertController.create({
-    header: 'Leave a Comment',
+    header: 'Your impression',
     inputs: [
+      {
+        name: 'rating',
+        type: 'text',
+        placeholder: 'Enter your rating (1–5)',
+        value: reading.Grade > 1 ? reading.Grade.toString() : ''
+      },
       {
         name: 'comment',
         type: 'textarea',
-        placeholder: 'Your thoughts...'
-      },
+        placeholder: 'Share your thoughts...',
+        value: reading.Comment || ''
+      }
     ],
     buttons: [
       { text: 'Cancel', role: 'cancel' },
       {
-        text: 'Submit',
+        text: 'Save',
         handler: (data) => {
-          this.handleCommentSubmit(bookId, data.comment);
+          this.saveImpression(reading, data.rating, data.comment);
         }
       }
     ]
@@ -142,24 +134,27 @@ async openCommentDialog(bookId: string) {
   await alert.present();
 }
 
-handleCommentSubmit(bookId: string, comment: string) {
-  const userId = getAuth().currentUser?.uid;
-  if (userId) {
-    const reading = this.myread.find(r => r.BookId === bookId);
-    if (!reading) return;
-
-    this.readingService.updateComment(userId, bookId, comment).subscribe(() => {
-      console.log('Comment submitted:', comment);
-
-      // Ako već postoji ocena, onda stavi status na Finished
-      if (reading.Grade > 0) {
-        this.readingService.updateStatus(userId, bookId, StatusEnum.Finished).subscribe(() => {
-          console.log('Status updated to Finished');
+saveImpression(reading: Reading, rating: number, comment: string) {
+  this.readingService.updateRatingAndComment(reading, rating, comment).subscribe({
+    next: () => {
+      reading.Grade = rating;
+      reading.Comment = comment;
+      if (rating > 0 && comment.trim() !== '') {
+        this.readingService.updateStatus(reading.Id, StatusEnum.Finished).subscribe(() => {
+          reading.Status = StatusEnum.Finished;
+          this.presentToast('Saved your impression!');
         });
+      } else {
+        this.presentToast('Saved your impression!');
       }
-    });
-  }
+    },
+    error: (err) => {
+      console.error('Error saving impression:', err);
+    }
+  });
 }
+
+
 
 
 

@@ -1,36 +1,3 @@
-<!-- <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>My Readings</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content class="ion-padding">
-
-  <ng-container *ngIf="books.length > 0; else noBooksTemplate">
-    <ion-card *ngFor="let book of books">
-      <ion-card-header>
-        <ion-card-title>{{ book.Title }}</ion-card-title>
-        <ion-card-subtitle>{{ book.Author }} — {{ book.PublishedYear }}</ion-card-subtitle>
-      </ion-card-header>
-
-      <ion-card-content>
-        {{ book.Description }}
-         <div>
-          <strong>Rating:</strong> {{ getRatingForBook(book.Id) }}
-          <ion-button (click)="openRatingDialog(book.Id)">Rate this book</ion-button>
-        </div>
-      </ion-card-content>
-    </ion-card>
-  </ng-container>
-
-  <ng-template #noBooksTemplate>
-    <ion-text color="medium" class="ion-text-center">
-      <p>You have no books in your reading list.</p>
-    </ion-text>
-  </ng-template>
-
-</ion-content> -->
-
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>My Readings</ion-title>
@@ -48,19 +15,50 @@
 
       <ion-card-content>
         {{ book.Description }}
-
         <!-- <ng-container *ngIf="myread.find(r => r.BookId === book.Id) as reading"> -->
         <ng-container *ngFor="let reading of myread" >
   <ng-container *ngIf="reading.BookId === book.Id">
-          <div *ngIf="reading.Status !== StatusEnum.Finished">
-            <ion-button size="small" (click)="openRatingDialog(book.Id)">Rate this book</ion-button>
-            <ion-button size="small" (click)="openCommentDialog(book.Id)">Leave a comment</ion-button>
+    <div *ngIf="reading.Status === StatusEnum.Finished">
+       <p><strong>Rating:</strong> {{ reading.Grade }}</p>
+       <p><strong>Comment:</strong> {{ reading.Comment }}</p>
+    </div>
+
+    <div>
+      <ion-button 
+          fill="clear" 
+          color="danger" 
+          size="small" 
+          [id]="'delete-alert-' + book.Id">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+      </ion-button>
+
+      <ion-alert
+        [trigger]="'delete-alert-' + book.Id"
+        header="Confirm Delete"
+        message="Are you sure you want to remove this book from your list?"
+        [buttons]="getAlertButtons(book.Id)"
+        (didDismiss)="setResult($event)">
+      </ion-alert>
+    </div>
+    
+         <div>
+            <ion-button
+              *ngIf="reading.Grade === 0 && (!reading.Comment || reading.Comment.trim() === '')"
+              size="small"
+              (click)="openImpressionDialog(book.Id)">
+              Your impression
+            </ion-button>
+
+            <ion-button
+              *ngIf="reading.Grade > 0 || (reading.Comment && reading.Comment.trim() !== '')"
+              fill="clear"
+              color="medium"
+              size="small"
+              (click)="openImpressionDialog(book.Id)">
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-button>
           </div>
 
-          <div *ngIf="reading.Status === StatusEnum.Finished">
-            <p><strong>Rating:</strong> {{ reading.Grade }}</p>
-            <p><strong>Comment:</strong> {{ reading.Comment }}</p>
-          </div>
         </ng-container>
         </ng-container>
       </ion-card-content>

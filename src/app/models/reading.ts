@@ -9,7 +9,7 @@ export class Reading {
     public UserId: string  = "",
     public BookId: string  = "",
     public Status: StatusEnum  = StatusEnum.WantToRead,
-    public Grade: number  = 1,
+    public Grade: number  = 0,
     public Comment: string  = "",
   ) {}
 }
