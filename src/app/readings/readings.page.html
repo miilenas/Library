@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<ion-header class="custom-header" [translucent]="true">
   <ion-toolbar>
     <ion-title>My Readings</ion-title>
   </ion-toolbar>
@@ -7,7 +7,7 @@
 <ion-content class="ion-padding">
 
   <ng-container *ngIf="books.length > 0; else noBooksTemplate">
-    <ion-card *ngFor="let book of books">
+    <ion-card *ngFor="let book of books" class="custom-card">
       <ion-card-header>
         <ion-card-title>{{ book.Title }}</ion-card-title>
         <ion-card-subtitle>{{ book.Author }} — {{ book.PublishedYear }}</ion-card-subtitle>
@@ -23,13 +23,13 @@
        <p><strong>Comment:</strong> {{ reading.Comment }}</p>
     </div>
 
-    <div>
+    <!-- <div>
       <ion-button 
           fill="clear" 
           color="danger" 
           size="small" 
           [id]="'delete-alert-' + book.Id">
-          <ion-icon slot="icon-only" name="trash"></ion-icon>
+          <ion-icon slot="icon-only" name="trash" size="large"></ion-icon>
       </ion-button>
 
       <ion-alert
@@ -55,9 +55,36 @@
               color="medium"
               size="small"
               (click)="openImpressionDialog(book.Id)">
-              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              <ion-icon slot="icon-only" name="create-outline" size="large"></ion-icon>
             </ion-button>
-          </div>
+          </div> -->
+
+<div class="actions-row">
+  <ion-button
+    *ngIf="reading.Grade > 0 || (reading.Comment && reading.Comment.trim() !== '')"
+    fill="clear"
+    color="medium"
+    size="small"
+    (click)="openImpressionDialog(book.Id)">
+    <ion-icon slot="icon-only" name="create-outline" size="large"></ion-icon>
+  </ion-button>
+
+  <ion-button 
+    fill="clear" 
+    color="danger" 
+    size="small" 
+    [id]="'delete-alert-' + book.Id">
+    <ion-icon slot="icon-only" name="trash" size="large"></ion-icon>
+  </ion-button>
+</div>
+
+<ion-alert
+  [trigger]="'delete-alert-' + book.Id"
+  header="Confirm Delete"
+  message="Are you sure you want to remove this book from your list?"
+  [buttons]="getAlertButtons(book.Id)"
+  (didDismiss)="setResult($event)">
+</ion-alert>
 
         </ng-container>
         </ng-container>

@@ -1,16 +1,16 @@
-<ion-header [translucent]="true">
+<ion-header class="custom-header" [translucent]="true">
   <ion-toolbar>
     <ion-title>Books you may like</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-button (click)="openAddBookDialog()">Add New Book</ion-button>
+  <ion-button class="add-book-button" (click)="openAddBookDialog()">Add New Book</ion-button>
 
  <ng-container *ngIf="books$ | async as books; else loading">
     
     <ng-container *ngIf="books.length > 0; else noBooksTemplate">
-      <ion-card *ngFor="let book of books">
+      <ion-card *ngFor="let book of books" class="custom-card">
      <ion-card-header>
           <ion-card-title>{{ book.Title }}</ion-card-title>
           <ion-card-subtitle>{{ book.Author }} — {{ book.PublishedYear }}</ion-card-subtitle>
@@ -18,9 +18,6 @@
         <ion-card-content>
           {{ book.Description }}
         </ion-card-content>
-        <!-- <ion-button fill="clear" (click)="addBookToReadings(book.Id)" aria-label="Add to Readings">
-        <ion-icon slot="icon-only" name="heart-outline" size="large"></ion-icon>
-        </ion-button> -->
         <ion-button fill="clear" (click)="addBookToReadings(book.Id)" 
         aria-label="Add to Readings"
           [disabled]="isBookInReadings(book.Id)">

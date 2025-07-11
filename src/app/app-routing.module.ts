@@ -8,7 +8,7 @@ export const routes: Routes = [
   // },
  {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'first',
     pathMatch: 'full'
   },
 
@@ -28,6 +28,10 @@ export const routes: Routes = [
   {
     path: 'tabs',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+  },
+  {
+    path:'first',
+    loadChildren: ()=>import('./firstPage/first.module').then(m=>m.FirstPageModule)
   }
 
 ];

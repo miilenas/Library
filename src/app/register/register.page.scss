@@ -1,0 +1,16 @@
+ion-content{
+  //  --background:#d6cfcb;
+--background: none;
+  background: url('/assets/back1.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+
+.custom-header ion-toolbar {
+  --background: #be986d;       
+}
+.custom-header ion-title {
+  font-weight: bold;
+  font-size: 22px;
+  color: #443627;
+  font-style: italic;
+}
