@@ -3,28 +3,55 @@
     <ion-title>Register</ion-title>
   </ion-toolbar>
 </ion-header>
-
+ 
 <ion-content [fullscreen]="true" class="ion-padding">
- <ion-item>
-    <ion-input label="First name" type="text" placeholder="Enter your first name" [(ngModel)]="firstName"></ion-input>
+
+  <form (ngSubmit)="register()">
+  <div class="button-wrapper">
+<ion-item class="rounded-input ion-margin-top">
+    <ion-input 
+    label="First name" 
+    type="text" 
+    placeholder="Enter your first name"
+    [(ngModel)]="firstName"
+    name="firstName">
+    </ion-input>
   </ion-item>
-   <ion-item>
-    <ion-input label="Last name" type="text" placeholder="Enter your last name" [(ngModel)]="lastName"></ion-input>
+
+  <ion-item class="rounded-input ion-margin-top">
+    <ion-input label="Last name" 
+    type="text" 
+    placeholder="Enter your last name" 
+    [(ngModel)]="lastName"
+    name="lastName">
+  </ion-input>
   </ion-item>
-  <ion-item>
-    <ion-input label="Email" type="email" placeholder="        Enter email" [(ngModel)]="email"></ion-input>
+
+ <ion-item class="rounded-input ion-margin-top">
+    <ion-input 
+    label="Email" 
+    type="email" 
+    placeholder="        Enter email" 
+    [(ngModel)]="email"
+    name="email">
+  </ion-input>
   </ion-item>
 
-  <ion-item class="ion-margin-top">
-    <ion-input label="Password" type="password" placeholder=" Enter password" [(ngModel)]="password"></ion-input>
+  <ion-item class="rounded-input ion-margin-top">
+  <ion-input 
+    label="Password" 
+    type="password" 
+    placeholder="Enter password" 
+    [(ngModel)]="password"
+    name="password">
+    <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+  </ion-input> 
   </ion-item>
 
-  <ion-button expand="block" class="ion-margin-top" (click)="register()">Register</ion-button>
+  <ion-button expand="block" fill="clear" class="ion-margin-top custom-register-button" (click)="register()">Register</ion-button>
 
-  <ion-button expand="block" fill="clear" class="ion-margin-top" routerLink="/login">Already have an account? Login </ion-button>
+  <ion-button expand="block" fill="clear"  style="--color: #443627" routerLink="/login">Already have an account? Login </ion-button>
 
-  <!-- <ion-text color="danger" *ngIf="errorMessage" class="ion-padding-top">
-    <p>{{ errorMessage }}</p>
-  </ion-text> -->
-
+  </div>
+ </form>
 </ion-content>

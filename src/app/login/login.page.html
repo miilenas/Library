@@ -6,29 +6,33 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
 
+<form (ngSubmit)="login()">
   <div class="button-wrapper">
   <ion-item class="rounded-input ion-margin-top">
-    <ion-input label="Email" type="email" placeholder="Enter email" [(ngModel)]="email"></ion-input>
+    <ion-input 
+    label="Email" 
+    type="email" 
+    placeholder="Enter email" 
+    [(ngModel)]="email"
+    name="email">  
+  </ion-input>
   </ion-item>
-
+ 
   <ion-item class="rounded-input ion-margin-top">
      <ion-input 
     label="Password" 
     type="password" 
     placeholder="Enter password" 
-    [(ngModel)]="password">
+    [(ngModel)]="password"
+    name="password">
     <ion-input-password-toggle slot="end"></ion-input-password-toggle>
   </ion-input>
  </ion-item>
 
-  <ion-button expand="block" class="ion-margin-top custom-login-button" (click)="login()">Login</ion-button>
+  <ion-button expand="block" fill="clear" class="ion-margin-top custom-login-button" (click)="login()">Login</ion-button>
 
-  <ion-button expand="block" fill="clear"  style="--color: #443627;" routerLink="/register">Don't have an account? Register </ion-button>
-
-  <!-- <ion-text color="danger" *ngIf="errorMessage" class="ion-padding-top">
-    <p>{{ errorMessage }}</p>
-  </ion-text> -->
-
+  <ion-button expand="block" fill="clear"  style="--color: #443627" routerLink="/register">Don't have an account? Register </ion-button>
 
   </div>
+ </form>
 </ion-content>

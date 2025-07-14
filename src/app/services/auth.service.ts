@@ -1,26 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from '@angular/fire/auth';
 import { Observable } from 'rxjs'; 
+import { Firestore, doc, setDoc, docData } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  // user$: Observable<User | null>;
+  user$: Observable<any>;
 
-  // constructor(private auth: Auth) {
-  //   this.user$ = new Observable<User | null>(observer => {
-  //     this.auth.onAuthStateChanged(user => {
-  //       observer.next(user);
-  //     });
-  //   });
-  // }
-
-   user$: Observable<User | null>;
-
-  constructor(private auth: Auth) {
-    this.user$ = new Observable<User | null>(observer => {
+  constructor(private auth: Auth,  private firestore: Firestore) {
+    this.user$ = new Observable(observer => {
       const unsubscribe = this.auth.onAuthStateChanged(user => {
         observer.next(user);
       });
@@ -33,14 +24,29 @@ export class AuthService {
    * @param password Lozinka korisnika.
    * @returns Promise sa UserCredential objektom.
    */
-  async register(email: string, password: string): Promise<any> {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-      return userCredential;
-    } catch (error) {
-      console.error("Error to register:", error);
-      throw error; 
-    }
+  // async register(email: string, password: string): Promise<any> {
+  //   try {
+  //     const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+  //     return userCredential;
+  //   } catch (error) {
+  //     console.error("Error to register:", error);
+  //     throw error; 
+  //   }
+  // }
+   async register(email: string, password: string, firstName: string, lastName: string): Promise<any> {
+    const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+    const uid = userCredential.user.uid;
+
+    // Dodavanje korisnika u Firestore
+    const userRef = doc(this.firestore, `users/${uid}`);
+    await setDoc(userRef, {
+      uid,
+      email,
+      firstName,
+      lastName
+    });
+
+    return userCredential;
   }
 
   /**
@@ -86,4 +92,17 @@ export class AuthService {
   });
   return uid;
 }
+
+getUserProfile(uid: string): Observable<any> {
+  const userRef = doc(this.firestore, `users/${uid}`);
+  return docData(userRef); // vraća Observable<{ uid, email, firstName, lastName }>
+}
+
+
+
+
+
+
+
+
 }

@@ -45,7 +45,7 @@ async presentToast(message: string) {
     return;
   }
     try {
-      await this.authService.register(this.email, this.password);
+      await this.authService.register(this.email, this.password, this.firstName, this.lastName);
       this.router.navigateByUrl('/tabs/readings', { replaceUrl: true }); 
     } catch (error: any) {
       // console.error('Error to login:', error.code, error.message);

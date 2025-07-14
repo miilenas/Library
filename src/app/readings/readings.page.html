@@ -23,42 +23,6 @@
        <p><strong>Comment:</strong> {{ reading.Comment }}</p>
     </div>
 
-    <!-- <div>
-      <ion-button 
-          fill="clear" 
-          color="danger" 
-          size="small" 
-          [id]="'delete-alert-' + book.Id">
-          <ion-icon slot="icon-only" name="trash" size="large"></ion-icon>
-      </ion-button>
-
-      <ion-alert
-        [trigger]="'delete-alert-' + book.Id"
-        header="Confirm Delete"
-        message="Are you sure you want to remove this book from your list?"
-        [buttons]="getAlertButtons(book.Id)"
-        (didDismiss)="setResult($event)">
-      </ion-alert>
-    </div>
-    
-         <div>
-            <ion-button
-              *ngIf="reading.Grade === 0 && (!reading.Comment || reading.Comment.trim() === '')"
-              size="small"
-              (click)="openImpressionDialog(book.Id)">
-              Your impression
-            </ion-button>
-
-            <ion-button
-              *ngIf="reading.Grade > 0 || (reading.Comment && reading.Comment.trim() !== '')"
-              fill="clear"
-              color="medium"
-              size="small"
-              (click)="openImpressionDialog(book.Id)">
-              <ion-icon slot="icon-only" name="create-outline" size="large"></ion-icon>
-            </ion-button>
-          </div> -->
-
 <div class="actions-row">
   <ion-button
     *ngIf="reading.Grade > 0 || (reading.Comment && reading.Comment.trim() !== '')"
