@@ -16,7 +16,7 @@ import { AlertController, ToastController } from '@ionic/angular';
 export class ReadingsPage implements OnInit {
   books: Book[] = [];
   myread: Reading[]=[];
-   StatusEnum = StatusEnum;
+  StatusEnum = StatusEnum;
 
   constructor(
     private readingService: ReadingService,
@@ -87,11 +87,12 @@ getAlertButtons(bookId: string) {
 setResult(ev: any) {
   console.log('Alert dismissed', ev);
 }
-async presentToast(message: string) {
+
+async presentToast(message: string, color: 'success' | 'danger' = 'success') {
   const toast = await this.toastController.create({
     message,
     duration: 2000,
-    color: 'success',
+    color,
     position: 'bottom'
   });
 
@@ -123,7 +124,11 @@ async openImpressionDialog(bookId: string) {
       {
         text: 'Save',
         handler: (data) => {
-          this.saveImpression(reading, data.rating, data.comment);
+          if (this.validateImpression(data.rating, data.comment)) {
+    this.saveImpression(reading, parseInt(data.rating), data.comment);
+    return true; 
+  }
+  return false;
         }
       }
     ]
@@ -131,7 +136,6 @@ async openImpressionDialog(bookId: string) {
 
   await alert.present();
 }
-
 saveImpression(reading: Reading, rating: number, comment: string) {
   this.readingService.updateRatingAndComment(reading, rating, comment).subscribe({
     next: () => {
@@ -150,6 +154,27 @@ saveImpression(reading: Reading, rating: number, comment: string) {
       console.error('Error saving impression:', err);
     }
   });
+}
+
+validateImpression(rating: any, comment: string): boolean {
+  const parsedRating = parseInt(rating);
+  
+  if (!rating || !comment || rating.toString().trim() === '' || comment.trim() === '') {
+    this.presentToast('All fields are required.', 'danger');
+    return false;
+  }
+
+  if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+    this.presentToast('Rating must be a number between 1 and 5.', 'danger');
+    return false;
+  }
+
+  if (!comment || comment.trim().length < 3) {
+    this.presentToast('Comment must be at least 3 characters long.', 'danger');
+    return false;
+  }
+
+  return true;
 }
 
 

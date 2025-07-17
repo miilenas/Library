@@ -51,16 +51,7 @@ ion-content{
   padding: 7px 3px; 
   margin-bottom: 7px;
 }
-
-.custom-logout-button{
-  --background: #bcac9b;       
-  --color: #443627;
-  --border-radius: 20px;
-  font-weight: bold;
-  font-size: 16px;
-  text-transform: none;
-  width: 150px;
-   --box-shadow: 0 4px 8px rgba(56, 39, 2, 0.838);
-   display: block;       
-  margin: 24px auto 0 auto; 
+.logout-button{
+  --background: #ded1c3;
+  font-size: 45px;
 }

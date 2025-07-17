@@ -3,7 +3,6 @@ ion-content{
  // background: url('/assets/back1.jpg') no-repeat center center fixed;
   background-size: cover;
 }
-
 .custom-header ion-toolbar {
   --background: #bcac9b;       
 }
@@ -13,23 +12,18 @@ ion-content{
   color: #443627;
   font-style: italic;
 }
-
-
-
 .custom-card {
   --background: #f5f1ed;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-  color: #443627;
+  color: #442c27;
 }
-
 .add-book-button {
 --background: #ded1c3;
   font-size: 35px;
-
 }
 .search-button {
   --background: #ded1c3;
   padding-left: 5px;
-  font-size: 30px;
+  font-size: 28px;
 }

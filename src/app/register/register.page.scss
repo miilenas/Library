@@ -5,7 +5,7 @@ ion-content{
 }
  
 .custom-header ion-toolbar {
-  --background: #ded1c3;       
+  --background: #bcac9b;        
 }
 .custom-header ion-title {
   font-weight: bold;
@@ -16,15 +16,15 @@ ion-content{
 
 .button-wrapper {
   position: relative;
-  top: 5%; 
+ // margin-top: 10%; 
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
 }
 
 .custom-register-button {
-  --background: #ded1c3;       
+  --background: #bcac9b;       
   --color: #443627;
   --border-radius: 20px;
   font-weight: bold;
@@ -40,7 +40,9 @@ ion-content{
   padding-inline-end: 10px;
   max-width: 305px;
 }
+.top-image{
+  height: 100px;
+ margin-top: 10px;
+ margin-left: 35%;
 
-ion-input-password-toggle::part(icon) {
-  --color: #ff0000; 
 }

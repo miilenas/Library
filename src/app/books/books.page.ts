@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { ReadingService } from '../services/readings.service';
 import { Reading } from '../models/reading';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-books',
@@ -19,15 +19,17 @@ export class BooksPage implements OnInit {
     noBooks: boolean = false;
     userId: string | null = null;
     readings: Reading[] = []; 
-  showSearch: boolean = false;
+   showSearch: boolean = false;
    allBooks: Book[] = [];          
-  filteredBooks: Book[] = [];
+   filteredBooks: Book[] = [];
 searchTerm: string = '';
   constructor(
     private booksService: BooksService,
     private readingService: ReadingService,
     private authService: AuthService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private toastController: ToastController
+
   ) { }
 
   ngOnInit() {
@@ -83,7 +85,14 @@ async openAddBookDialog() {
       {
         text: 'Add',
         handler: (data) => {
+           const validationError = this.validateBookData(data);
+          if (validationError) {
+            this.showToast(validationError, 'danger');
+            return false;
+          }
           this.addNewBook(data);
+          this.showToast('Book added successfully!', 'success');
+          return true;
         }
       }
     ]
@@ -124,6 +133,39 @@ toggleSearch() {
       book.Title.toLowerCase().startsWith(term)
     );
   }
+async showToast(message: string, color: 'success' | 'danger' = 'success') {
+  const toast = await this.toastController.create({
+    message,
+    duration: 2000,
+    color,
+    position: 'bottom'
+  });
+  toast.present();
+}
+validateBookData(data: any): string | null {
+  if (!data.title || !data.author || !data.description || !data.year) {
+    return 'All fields are required.';
+  }
+  const year = parseInt(data.year, 10);
+  if (isNaN(year) || year>2025) {
+    return 'Published year must be in the past.';
+  } 
+   if (isNaN(year) || year<1000) {
+    return 'Published year must be a positive number.';
+  } 
+  if (data.title.length<=3 ){
+    return 'Title must have at least 4 characters!'
+  }
+  if (data.author.length<=3 ){
+    return 'Author must have at least 4 characters!'
+  }
+  if (data.description.length<=3 ){
+    return 'Description must have at least 4 characters!'
+  }
+
+  return null;
+}
+
 
 
 

@@ -46,9 +46,7 @@ async presentToast(message: string) {
     try {
       await this.authService.login(this.email, this.password);
       this.router.navigateByUrl('/tabs/readings', { replaceUrl: true }); 
-    } catch (error: any) {
-      // console.error('Error to login:', error.code, error.message);
-      // console.error(error);
+    } catch (error: any) { 
       switch (error.code) {
         case 'auth/user-not-found':
         case 'auth/wrong-password':
