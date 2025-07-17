@@ -1,12 +1,11 @@
 ion-content{
-  //  --background:#d6cfcb;
---background: none;
-  background: url('/assets/back1.jpg') no-repeat center center fixed;
+  --background:#f5f1ed;
+//  background: url('/assets/back1.jpg') no-repeat center center fixed;
   background-size: cover;
 }
  
 .custom-header ion-toolbar {
-  --background: #be986d;       
+  --background: #ded1c3;       
 }
 .custom-header ion-title {
   font-weight: bold;
@@ -25,8 +24,8 @@ ion-content{
 }
 
 .custom-register-button {
-  --background: #be986d;       
-  --color: #fef9ef;
+  --background: #ded1c3;       
+  --color: #443627;
   --border-radius: 20px;
   font-weight: bold;
   font-size: 16px;
@@ -39,7 +38,7 @@ ion-content{
   --border-radius: 20px;
   padding-inline-start: 10px;
   padding-inline-end: 10px;
-  max-width: 300px;
+  max-width: 305px;
 }
 
 ion-input-password-toggle::part(icon) {

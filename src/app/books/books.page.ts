@@ -18,8 +18,11 @@ export class BooksPage implements OnInit {
    books$: Observable<Book[]> | undefined;
     noBooks: boolean = false;
     userId: string | null = null;
-    readings: Reading[] = [];
-
+    readings: Reading[] = []; 
+  showSearch: boolean = false;
+   allBooks: Book[] = [];          
+  filteredBooks: Book[] = [];
+searchTerm: string = '';
   constructor(
     private booksService: BooksService,
     private readingService: ReadingService,
@@ -28,23 +31,21 @@ export class BooksPage implements OnInit {
   ) { }
 
   ngOnInit() {
-      // this.userId = this.authService.getCurrentUserUid();
-      // console.log('Current User ID:', this.userId);
     this.authService.user$.subscribe(user => {
     this.userId = user ? user.uid : null; 
-    console.log('Current User ID:', this.userId);
     this.loadReadings()
   });
 
     this.books$ = this.booksService.getBooks();
     this.books$.subscribe(books => {
+      this.allBooks = books;
+      this.filteredBooks = books;
       this.noBooks = books.length === 0;
     });
   }
 loadReadings() {
   if (this.userId) {
     this.readingService.getReadingsForUser(this.userId).subscribe(readings => {
-      console.log('Readings:', readings); // Logovanje učitanih reading-a
       this.readings = readings;
     });
   }
@@ -58,7 +59,6 @@ loadReadings() {
       }
     this.readingService.addBookToReadings(this.userId, bookId).subscribe({
       next: () => {
-        console.log('Book added to readings');
          this.loadReadings(); 
       },
       error: (error) => {
@@ -101,7 +101,6 @@ addNewBook(data: any) {
 
   this.booksService.addBook(newBook).subscribe({
     next: () => {
-      console.log('Book added successfully');
       this.books$ = this.booksService.getBooks(); 
     },
     error: (err) => console.error('Error adding book:', err)
@@ -111,7 +110,20 @@ isBookInReadings(bookId: string): boolean {
   return this.readings.some(r => r.BookId === bookId);
 }
 
+toggleSearch() {
+    this.showSearch = !this.showSearch;
+    if (!this.showSearch) {
+      this.filteredBooks = this.allBooks;
+      this.searchTerm = '';
+    }
+  }
 
+  filterBooks() {
+    const term = this.searchTerm.toLowerCase().trim();
+    this.filteredBooks = this.allBooks.filter(book =>
+      book.Title.toLowerCase().startsWith(term)
+    );
+  }
 
 
 

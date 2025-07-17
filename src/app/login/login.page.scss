@@ -1,12 +1,11 @@
 ion-content{
-  //  --background:#d6cfcb;
---background: none;
-  background: url('/assets/back1.jpg') no-repeat center center fixed;
+  --background:#ded1c3;
+ // background: url('/assets/back1.jpg') no-repeat center center fixed;
   background-size: cover;
 }
 
 .custom-header ion-toolbar {
-  --background: #be986d;       
+  --background: #a99985;       
 }
 
 .custom-header ion-title {
@@ -18,16 +17,16 @@ ion-content{
 
 .button-wrapper {
   position: relative;
-  top: 5%; 
+  margin-top: 15%; 
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
 }
 
 .custom-login-button {
-  --background: #be986d;       
-  --color: #fef9ef;
+  --background: #bcac9b;       
+  --color: #443627;
   --border-radius: 20px;
   font-weight: bold;
   font-size: 16px;

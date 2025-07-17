@@ -22,10 +22,6 @@ export class LoginPage implements OnInit {
   private toastController = inject(ToastController);
 
 
-  // constructor() {
-  //   console.log("loginpage");
-  //  }
-
   ngOnInit() {
   }
 

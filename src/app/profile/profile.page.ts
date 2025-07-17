@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service'; 
 import { User } from '@angular/fire/auth';
-import { Observable, switchMap } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
+import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-profile',
@@ -12,18 +13,31 @@ import { Observable, switchMap } from 'rxjs';
 export class ProfilePage implements OnInit {
 
    userProfile$!: Observable<any>;
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, 
+    private navCtrl: NavController) { }
 
-  ngOnInit() {
-    this.userProfile$ = this.authService.user$.pipe(
-      switchMap((user: User | null) => {
-        if (user) {
-          return this.authService.getUserProfile(user.uid);
-        } else {
-          return new Observable(observer => observer.next(null));
-        }
-      })  
-    );
+ngOnInit() {
+  this.authService.user$.subscribe(user => {
+  });
+
+  this.userProfile$ = this.authService.user$.pipe(
+    switchMap((user: User | null) => {
+      if (user) {
+        return this.authService.getUserProfile(user.uid);
+      } else {
+        return of(null);
+      }
+    })
+  );
+}
+
+ async logout() {
+    try {
+      await this.authService.logout();
+      this.navCtrl.navigateRoot('/first'); 
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
   }
 
 }

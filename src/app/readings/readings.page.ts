@@ -36,13 +36,11 @@ export class ReadingsPage implements OnInit {
         return [];
       }
       const bookObservables = readings.map(r => this.bookService.getBookById(r.BookId));
-      console.log('Book observables:', bookObservables);
       return combineLatest(bookObservables);
     })
   ).subscribe({
     next: (books: Book[]) => {
       this.books = books;
-      console.log('Fetched books:', this.books);
     },
     error: (error) => {
       console.error('Error fetching books:', error);

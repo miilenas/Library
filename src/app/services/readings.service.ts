@@ -18,7 +18,6 @@ getReadingsForUser(UserId: string): Observable<Reading[]> {
 
  return collectionData(readingsQuery, { idField: 'Id' }).pipe(
     map((data) => {
-      console.log('Fetched readings:', data); 
       return data.map(item => ({
         Id: item['Id'],
         UserId: item['UserId'],
@@ -87,11 +86,9 @@ updateRatingAndComment(reading: Reading, rating: number, comment: string): Obser
       updateRating$.subscribe({
         next: () => {
           reading.Grade = rating;
-          console.log('Rating updated');
           updateComment$.subscribe({
             next: () => {
               reading.Comment = comment;
-              console.log('Comment updated');
               observer.next();
               observer.complete();
             },

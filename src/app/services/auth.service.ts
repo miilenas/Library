@@ -82,20 +82,20 @@ export class AuthService {
    * Dohvata UID trenutno prijavljenog korisnika.
    * @returns UID korisnika (string) ili null ako niko nije prijavljen.
    */
-  // getCurrentUserUid(): string | null {
-  //   return this.auth.currentUser ? this.auth.currentUser.uid : null;
-  // }
   getCurrentUserUid(): string | null {
-  let uid: string | null = null;
-  this.user$.subscribe(user => {
-    uid = user ? user.uid : null;
-  });
-  return uid;
-}
+    return this.auth.currentUser ? this.auth.currentUser.uid : null;
+  }
+//   getCurrentUserUid(): string | null {
+//   let uid: string | null = null;
+//   this.user$.subscribe(user => {
+//     uid = user ? user.uid : null;
+//   });
+//   return uid;
+// }
 
 getUserProfile(uid: string): Observable<any> {
   const userRef = doc(this.firestore, `users/${uid}`);
-  return docData(userRef); // vraća Observable<{ uid, email, firstName, lastName }>
+  return docData(userRef); 
 }
 
 

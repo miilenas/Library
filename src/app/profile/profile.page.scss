@@ -1,12 +1,11 @@
 ion-content{
-  //  --background:#d6cfcb;
---background: none;
-  background: url('/assets/back1.jpg') no-repeat center center fixed;
+   --background:#ded1c3;
+  // background: url('/assets/back1.jpg') no-repeat center center fixed;
   background-size: cover;
 }
 
 .custom-header ion-toolbar {
-  --background: #be986d;       
+  --background: #bcac9b;       
 }
 .custom-header ion-title {
   font-weight: bold;
@@ -36,7 +35,7 @@ ion-content{
 }
 
 .custom-list{
- background-color: #fef9ef; 
+ background-color: #f5f1ed;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
   color: #443627;
@@ -51,4 +50,17 @@ ion-content{
   min-height: 64px; 
   padding: 7px 3px; 
   margin-bottom: 7px;
+}
+
+.custom-logout-button{
+  --background: #bcac9b;       
+  --color: #443627;
+  --border-radius: 20px;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: none;
+  width: 150px;
+   --box-shadow: 0 4px 8px rgba(56, 39, 2, 0.838);
+   display: block;       
+  margin: 24px auto 0 auto; 
 }

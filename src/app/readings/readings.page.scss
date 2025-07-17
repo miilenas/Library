@@ -1,5 +1,10 @@
+ion-content{
+ --background:#ded1c3;
+//  background: url('/assets/backPaper.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
 .custom-header ion-toolbar {
-  --background: #be986d;       
+  --background: #bcac9b;       
 }
 .custom-header ion-title {
   font-weight: bold;
@@ -7,16 +12,8 @@
   color: #443627;
   font-style: italic;
 }
-
-ion-content{
-  //  --background:#d6cfcb;
---background: none;
-  background: url('/assets/back1.jpg') no-repeat center center fixed;
-  background-size: cover;
-}
-
 .custom-card {
-  --background: #fef9ef;
+  --background: #f5f1ed;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
   color: #443627;

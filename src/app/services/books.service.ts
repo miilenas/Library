@@ -18,7 +18,6 @@ export class BooksService {
   }
 
   getBookById(bookId: string): Observable<Book> {
-     console.log('Pozivam getBookById sa ID:', bookId);
   const ref = doc(this.firestore, `books/${bookId}`);
   return docData(ref, { idField: 'Id' }) as Observable<Book>;
 }

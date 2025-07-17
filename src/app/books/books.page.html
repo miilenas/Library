@@ -6,9 +6,24 @@
 
 <ion-content class="ion-padding">
 
-  <ion-button class="add-book-button" (click)="openAddBookDialog()">Add New Book</ion-button>
+  <!-- <ion-button class="add-book-button" (click)="openAddBookDialog()">Add New Book</ion-button> -->
+<ion-button  fill="clear"(click)="openAddBookDialog()" class="add-book-button">
+  <ion-icon name="add-outline"  slot="icon-only"  color="danger"></ion-icon>
+</ion-button>
 
- <ng-container *ngIf="books$ | async as books; else loading">
+<ion-button fill="clear" class="search-button" (click)="toggleSearch()" class="search-button">
+  <ion-icon name="search-outline" slot="icon-only" color="danger"></ion-icon>
+</ion-button>
+
+<ion-searchbar
+  *ngIf="showSearch"
+  [(ngModel)]="searchTerm"
+  (ionInput)="filterBooks()"
+  placeholder="Search by title">
+</ion-searchbar>
+
+
+<ng-container *ngIf="filteredBooks as books; else loading">
     
     <ng-container *ngIf="books.length > 0; else noBooksTemplate">
       <ion-card *ngFor="let book of books" class="custom-card">
