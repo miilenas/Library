@@ -9,27 +9,26 @@
   <ng-container *ngIf="books.length > 0; else noBooksTemplate">
     <ion-card *ngFor="let book of books" class="custom-card">
       <ion-card-header>
-        <ion-card-title>{{ book.Title }}</ion-card-title>
-        <ion-card-subtitle>{{ book.Author }} — {{ book.PublishedYear }}</ion-card-subtitle>
+        <ion-card-title>{{ book.title }}</ion-card-title>
+        <ion-card-subtitle>{{ book.author }} — {{ book.publishedYear }}</ion-card-subtitle>
       </ion-card-header>
 
       <ion-card-content>
-        {{ book.Description }}
+        {{ book.description }}
         <!-- <ng-container *ngIf="myread.find(r => r.BookId === book.Id) as reading"> -->
         <ng-container *ngFor="let reading of myread" >
-  <ng-container *ngIf="reading.BookId === book.Id">
-    <div *ngIf="reading.Status === StatusEnum.Finished">
-       <p><strong>Rating:</strong> {{ reading.Grade }}</p>
-       <p><strong>Comment:</strong> {{ reading.Comment }}</p>
+  <ng-container *ngIf="reading.bookId === book.id">
+    <div *ngIf="reading.status === StatusEnum.Finished">
+       <p><strong>Rating:</strong> {{ reading.grade }}</p>
+       <p><strong>Comment:</strong> {{ reading.comment }}</p>
     </div>
 
 <div class="actions-row">
   <ion-button
-    *ngIf="reading.Grade > 0 || (reading.Comment && reading.Comment.trim() !== '')"
     fill="clear"
     color="medium"
     size="small"
-    (click)="openImpressionDialog(book.Id)">
+    (click)="openImpressionDialog(book.id)">
     <ion-icon slot="icon-only" name="create-outline" size="large"></ion-icon>
   </ion-button>
 
@@ -37,16 +36,16 @@
     fill="clear" 
     color="danger" 
     size="small" 
-    [id]="'delete-alert-' + book.Id">
+    [id]="'delete-alert-' + book.id">
     <ion-icon slot="icon-only" name="trash" size="large"></ion-icon>
   </ion-button>
 </div>
 
 <ion-alert
-  [trigger]="'delete-alert-' + book.Id"
+  [trigger]="'delete-alert-' + book.id"
   header="Confirm Delete"
   message="Are you sure you want to remove this book from your list?"
-  [buttons]="getAlertButtons(book.Id)"
+  [buttons]="getAlertButtons(book.id)"
   (didDismiss)="setResult($event)">
 </ion-alert>
 

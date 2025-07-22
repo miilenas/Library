@@ -1,7 +1,8 @@
-import { inject, Injectable } from '@angular/core';
-import { Firestore, collectionData, collection, doc, docData, addDoc } from '@angular/fire/firestore';
+import { inject, Injectable } from '@angular/core';import { Firestore, collectionData, collection, doc, docData, addDoc } from '@angular/fire/firestore';
 import { from, map, Observable } from 'rxjs';
 import { Book } from '../models/book';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 
 @Injectable({
@@ -9,27 +10,32 @@ import { Book } from '../models/book';
 })
 
 export class BooksService {
+  constructor(private http: HttpClient) {}
 
-   private firestore = inject(Firestore);
 
   getBooks(): Observable<Book[]> {
-    const booksCollection = collection(this.firestore, 'books');
-    return collectionData(booksCollection, { idField: 'Id' }) as Observable<Book[]>;
+     return this.http.get<Book[]>(`https://${environment.firebaseRDBUrl}/books.json`).pipe(
+      map(response => {
+        const books: Book[] = [];
+        for (const key in response) {
+          if (response.hasOwnProperty(key)) {
+            books.push({ ...response[key], id: key });
+          }
+        }
+        return books;
+      })
+    );
   }
 
   getBookById(bookId: string): Observable<Book> {
-  const ref = doc(this.firestore, `books/${bookId}`);
-  return docData(ref, { idField: 'Id' }) as Observable<Book>;
+     return this.http.get<Book>(`https://${environment.firebaseRDBUrl}/books/${bookId}.json`).pipe(
+       map(book => {
+        return { ...book, id: bookId };
+      })
+    );
 }
-addBook(book: Book): Observable<void> {
-  const ref = collection(this.firestore, 'books');
-  const bookData = {
-    Title: book.Title,
-    Author: book.Author,
-    Description: book.Description,
-    PublishedYear: book.PublishedYear
-  };
-  return from(addDoc(ref, bookData)).pipe(map(() => void 0));
+addBook(book: Omit<Book, 'id'>): Observable<{ name: string }> {
+return this.http.post<{ name: string }>(`https://${environment.firebaseRDBUrl}/books.json`, book);
 }
 
 

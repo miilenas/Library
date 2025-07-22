@@ -1,10 +1,10 @@
 export class Book {
   constructor(
-    public Id: string = "",
-    public Title: string  = "",
-    public Author: string  = "",
-    public Description: string  = "",
-    public PublishedYear: number=1800,
+    public id: string = "",
+    public title: string  = "",
+    public author: string  = "",
+    public description: string  = "",
+    public publishedYear: number=1800,
     // public userId: string,
   ) {}
 }

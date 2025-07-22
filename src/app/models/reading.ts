@@ -5,11 +5,11 @@ export enum StatusEnum{
 }
 export class Reading {
   constructor(
-    public Id: string = "",
-    public UserId: string  = "",
-    public BookId: string  = "",
-    public Status: StatusEnum  = StatusEnum.WantToRead,
-    public Grade: number  = 0,
-    public Comment: string  = "",
+    public id: string = "",
+    public userId: string  = "",
+    public bookId: string  = "",
+    public status: StatusEnum  = StatusEnum.WantToRead,
+    public grade: number  = 0,
+    public comment: string  = "",
   ) {}
 }

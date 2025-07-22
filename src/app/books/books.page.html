@@ -15,7 +15,7 @@
   <ion-icon name="search-outline" slot="icon-only" color="danger"></ion-icon>
 </ion-button>
 
-<ion-searchbar
+<ion-searchbar  
   *ngIf="showSearch"
   [(ngModel)]="searchTerm"
   (ionInput)="filterBooks()"
@@ -28,18 +28,18 @@
     <ng-container *ngIf="books.length > 0; else noBooksTemplate">
       <ion-card *ngFor="let book of books" class="custom-card">
      <ion-card-header>
-          <ion-card-title>{{ book.Title }}</ion-card-title>
-          <ion-card-subtitle>{{ book.Author }} — {{ book.PublishedYear }}</ion-card-subtitle>
+          <ion-card-title>{{ book.title }}</ion-card-title>
+          <ion-card-subtitle>{{ book.author }} — {{ book.publishedYear }}</ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
-          {{ book.Description }}
+          {{ book.description }}
         </ion-card-content>
-        <ion-button fill="clear" (click)="addBookToReadings(book.Id)" 
+        <ion-button fill="clear" (click)="addBookToReadings(book.id)" 
         aria-label="Add to Readings"
-          [disabled]="isBookInReadings(book.Id)">
+          [disabled]="isBookInReadings(book.id)">
           <ion-icon
             slot="icon-only"
-            [name]="isBookInReadings(book.Id) ? 'heart' : 'heart-outline'"
+            [name]="isBookInReadings(book.id) ? 'heart' : 'heart-outline'"
             color="danger"
             size="large"
           ></ion-icon>

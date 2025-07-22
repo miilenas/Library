@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -15,11 +16,10 @@ export class RegisterPage implements OnInit {
   password!: string;
   firstName!: string;
   lastName!: string;
- // errorMessage: string | null = null;
 
-   private authService = inject(AuthService);
+  private authService = inject(AuthService);
   private router = inject(Router);
- private toastController = inject(ToastController);
+  private toastController = inject(ToastController);
   constructor() { }
 
   ngOnInit() {
@@ -44,21 +44,32 @@ async presentToast(message: string) {
     this.presentToast('Password must be at least 5 characters long.');
     return;
   }
-    try {
-      await this.authService.register(this.email, this.password, this.firstName, this.lastName);
-      this.router.navigateByUrl('/tabs/readings', { replaceUrl: true }); 
+      try {
+          const userData = {
+            email: this.email,
+            password: this.password,
+            firstName: this.firstName, 
+            lastName: this.lastName
+          };
+      await firstValueFrom(this.authService.register(userData));
+      this.router.navigateByUrl('/tabs/books', { replaceUrl: true }); 
     } catch (error: any) {
-      // console.error('Error to login:', error.code, error.message);
-      // console.error(error);
-      switch (error.code) {
-        case 'auth/invalid-email':
-          this.presentToast('Invalid email format.');
-          break;
-          case 'auth/email-already-in-use':
-           this.presentToast('Email is already in use.');
-           break;
-        default:
-          this.presentToast('Unexpected error. Please try later.');
+      const firebaseError=error?.message;
+        switch (firebaseError) {
+    case 'INVALID_EMAIL':
+      this.presentToast('Invalid email format.');
+      break;
+    case 'INVALID_LOGIN_CREDENTIALS':
+      this.presentToast('Invalid credentials, try again.');
+      break;
+    case 'EMAIL_EXISTS':
+        this.presentToast('Email is taken.');   
+        break;  
+    case 'TOO_MANY_ATTEMPTS_TRY_LATER':
+      this.presentToast('Too many tries. Please try later.');
+      break;
+    default:
+      this.presentToast('Unexpected error. Please try later.');
       }
     }
   }

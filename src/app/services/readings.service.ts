@@ -1,106 +1,131 @@
-import { inject, Injectable } from '@angular/core';
-import { Firestore, collectionData, collection, query, where, doc, updateDoc, setDoc, deleteDoc } from '@angular/fire/firestore';
-import { combineLatest, from, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
+import {Injectable } from '@angular/core';import {BehaviorSubject, map, Observable, of, switchMap, take } from 'rxjs';
 import { Reading, StatusEnum } from '../models/reading';
-import { getAuth } from 'firebase/auth';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { AuthService } from './auth.service';
+import { environment } from 'src/environments/environment';
  
 @Injectable({
   providedIn: 'root'
 })
 
 export class ReadingService{
-private firestore = inject(Firestore);
+  private readingsSubject = new BehaviorSubject<Reading[]>([]);
+  public readings$ = this.readingsSubject.asObservable();
+constructor(private http: HttpClient, private authService: AuthService) {}
 
-getReadingsForUser(UserId: string): Observable<Reading[]> {
-  const ref = collection(this.firestore, 'readings');
-  const readingsQuery = query(ref, where('UserId', '==', UserId),
-   where('Status', 'in', [StatusEnum.Reading,  StatusEnum.WantToRead, StatusEnum.Finished]));
+ private getAuthParams() {
+    const token = this.authService.getToken();
+    let params = new HttpParams();
+    if (token) {
+      params = params.set('auth', token);
+    }
+    return params;
+  }
 
- return collectionData(readingsQuery, { idField: 'Id' }).pipe(
-    map((data) => {
-      return data.map(item => ({
-        Id: item['Id'],
-        UserId: item['UserId'],
-        BookId: item['BookId'],
-        Status: item['Status'],
-        Grade: item['Grade'],
-        Comment: item['Comment']
-      }));
-    })
-  ) as Observable<Reading[]>;
+getReadingsForUser(userId: string): Observable<Reading[]> {
+   const params = this.getAuthParams()
+      .set('orderBy', '"userId"')
+      .set('equalTo', `"${userId}"`);
+    
+    return this.http.get<{ [key: string]: any }>(`https://${environment.firebaseRDBUrl}/readings.json`, { params }).pipe(
+      map(responseData => {
+        const readings = !responseData
+            ? []
+            : Object.entries(responseData).map(([id, data]: [string, any]) => ({
+                id,
+                userId: data.userId,
+                bookId: data.bookId,
+                status: data.status as StatusEnum,
+                grade: data.grade,
+                comment: data.comment
+              }));
+          this.readingsSubject.next(readings);
+          return readings;
+        })
+      );
 }
+getReadingsStream(): Observable<Reading[]> {
+    return this.readings$;
+  }
   
- addBookToReadings(userId: string, bookId: string): Observable<void> {
-       const ref = collection(this.firestore, 'readings');
-    const checkQuery = query(ref, where('UserId', '==', userId), where('BookId', '==', bookId));
+addBookToReadings(userId: string, bookId: string): Observable<Reading> {
+  return this.getReadingsForUser(userId).pipe(
+    take(1),
+    switchMap(readings => {
+      if (readings.some(r => r.bookId === bookId)) {
+        console.warn('Book already in readings');
+        return of(null as any); 
+      }
 
-    return collectionData(checkQuery).pipe(
-      take(1),
-      switchMap((existing: any[]) => {
-        if (existing.length > 0) {
-          console.warn('Book already in readings');
-          return of(void 0);
-        }
+      const newReading: Omit<Reading, 'id'> = {
+        userId,
+        bookId,
+        status: StatusEnum.WantToRead,
+        grade: 0,
+        comment: ''
+      };
 
-        const readingData = {
-          UserId: userId,
-          BookId: bookId,
-          Status: StatusEnum.WantToRead,
-          Grade: 1,
-          Comment: ''
-        };
-
-        const newDocRef = doc(ref); // auto-generisan ID
-        return from(setDoc(newDocRef, readingData));
+      return this.http.post<{ name: string }>(
+        `https://${environment.firebaseRDBUrl}/readings.json`,
+        newReading,
+        { params: this.getAuthParams() }
+      ).pipe(
+            map(res => {
+              const created: Reading = { id: res.name, ...newReading };
+              const current = this.readingsSubject.getValue();
+              this.readingsSubject.next([...current, created]);
+              return created;
+        })
+          );
       })
     );
   }
 
- updateRating(readingId: string, rating: number): Observable<void> {
-    const readingDoc = doc(this.firestore, `readings/${readingId}`);
-    return from(updateDoc(readingDoc, { Grade: rating }));
-  }
 
-  updateComment(readingId: string, comment: string): Observable<void> {
-    const readingDoc = doc(this.firestore, `readings/${readingId}`);
-    return from(updateDoc(readingDoc, { Comment: comment }));
-  }
-
-
- updateStatus(readingId: string, status: StatusEnum): Observable<void> {
-    const readingDoc = doc(this.firestore, `readings/${readingId}`);
-    return from(updateDoc(readingDoc, { Status: status }));
-  }
-
-deleteReading(readingId: string){
-  const readingDocRef = doc(this.firestore, 'readings', readingId);
- // return deleteDoc(readingDocRef);
-  return from(deleteDoc(readingDocRef));
-}
-
-updateRatingAndComment(reading: Reading, rating: number, comment: string): Observable<void> {
-    const updateRating$ = this.updateRating(reading.Id, rating);
-    const updateComment$ = this.updateComment(reading.Id, comment);
-
-    return new Observable<void>(observer => {
-      updateRating$.subscribe({
-        next: () => {
-          reading.Grade = rating;
-          updateComment$.subscribe({
-            next: () => {
-              reading.Comment = comment;
-              observer.next();
-              observer.complete();
-            },
-            error: err => observer.error(err)
-          });
-        },
-        error: err => observer.error(err)
-      });
+  updateReading(readingId: string, updateData: Partial<Reading>): Observable<void> {
+    return this.http.patch<void>(`https://${environment.firebaseRDBUrl}/readings/${readingId}.json`, updateData, {
+      params: this.getAuthParams()
     });
   }
 
+  updateRating(readingId: string, rating: number): Observable<void> {
+    return this.updateReading(readingId, { grade: rating });
+  }
 
+  updateComment(readingId: string, comment: string): Observable<void> {
+    return this.updateReading(readingId, { comment });
+  }
+
+  updateStatus(readingId: string, status: StatusEnum): Observable<void> {
+    return this.updateReading(readingId, { status });
+  }
+
+  deleteReading(readingId: string): Observable<void> {
+    return this.http.delete<void>(`https://${environment.firebaseRDBUrl}/readings/${readingId}.json`, {
+      params: this.getAuthParams()
+    });
+  }
+
+  updateRatingAndComment(reading: Reading, rating: number, comment: string): Observable<void> {
+    return this.updateReading(reading.id, {
+      grade: rating,
+      comment: comment
+    });
+  }
+addReading(userId: string, bookId: string, status: string, grade: string, comment: string) {
+  const newReading = {
+    userId,
+    bookId,
+    status,
+    grade,
+    comment
+  };
+
+  return this.http.post(
+    `https://${environment.firebaseRDBUrl}/readings.json`,
+    newReading
+  );
+}
 
 
 

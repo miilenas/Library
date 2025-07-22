@@ -2,8 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-
-
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -37,32 +36,42 @@ async presentToast(message: string) {
 
    async login() {
     this.errorMessage = null;
-
+  
+  if (this.password.length < 5) {
+    this.presentToast('Password must be at least 5 characters long.');
+    return;
+  }
       if (!this.email || !this.password) {
      this.presentToast ('Email and password are required.');
     return;
     }
 
     try {
-      await this.authService.login(this.email, this.password);
-      this.router.navigateByUrl('/tabs/readings', { replaceUrl: true }); 
-    } catch (error: any) { 
-      switch (error.code) {
-        case 'auth/user-not-found':
-        case 'auth/wrong-password':
-          this.presentToast ('Wrong email or password.');
-          break;
-        case 'auth/invalid-credential':
-          this.presentToast('Invalid credentials.');
-          break;  
-        case 'auth/invalid-email':
-          this.presentToast('Invalid email format.') ;
-          break;
-        case 'auth/too-many-requests':
-         this.presentToast ('Too many tries. Please try later.') ;
-          break;
-        default:
-          this.presentToast('Unexpected error. Please try later.');
+      const userData = {
+        email: this.email,
+        password: this.password
+      };
+      await firstValueFrom(this.authService.login(userData));
+      this.router.navigateByUrl('/tabs/books', { replaceUrl: true }); 
+    } catch (error: any) {
+      
+       const firebaseError =error?.message; 
+      switch (firebaseError) {
+         case 'EMAIL_NOT_FOUND':
+    case 'INVALID_PASSWORD':
+      this.presentToast('Wrong email or password.');
+      break;
+    case 'INVALID_EMAIL':
+      this.presentToast('Invalid email format.');
+      break;
+    case 'INVALID_LOGIN_CREDENTIALS':
+      this.presentToast('Invalid credentials, try again.');
+      break;
+    case 'TOO_MANY_ATTEMPTS_TRY_LATER':
+      this.presentToast('Too many tries. Please try later.');
+      break;
+    default:
+      this.presentToast('Unexpected error. Please try later.');
       }
     }
   }

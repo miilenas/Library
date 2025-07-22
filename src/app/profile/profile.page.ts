@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service'; 
-import { User } from '@angular/fire/auth';
 import { Observable, of, switchMap } from 'rxjs';
 import { NavController } from '@ionic/angular';
+import { User } from '../models/user';
 
 @Component({
   selector: 'app-profile',
@@ -12,28 +12,36 @@ import { NavController } from '@ionic/angular';
 })
 export class ProfilePage implements OnInit {
 
-   userProfile$!: Observable<any>;
-  constructor(private authService: AuthService, 
-    private navCtrl: NavController) { }
+   userProfile$!: Observable<User | null>;
+   userId: string | null = null;
+
+  constructor(private authService: AuthService, private navCtrl: NavController) { }
+  
 
 ngOnInit() {
-  this.authService.user$.subscribe(user => {
-  });
+  const storedUser = localStorage.getItem('userData');
+  if (storedUser) {
+    try {
+      const parsedUser = JSON.parse(storedUser);
+      this.userId = parsedUser.id || null;
+    } catch (e) {
+      console.error('Greška pri parsiranju localStorage user-a:', e);
+    }
+  }
 
-  this.userProfile$ = this.authService.user$.pipe(
-    switchMap((user: User | null) => {
-      if (user) {
-        return this.authService.getUserProfile(user.uid);
-      } else {
-        return of(null);
-      }
-    })
-  );
+  if (!this.userId) {
+    console.warn('Nema userId, prekidam.');
+    this.userProfile$ = of(null);
+    return;
+  }
+
+  this.userProfile$ = this.authService.getUserProfile(this.userId);
 }
+
 
  async logout() {
     try {
-      await this.authService.logout();
+      this.authService.logout();
       this.navCtrl.navigateRoot('/first'); 
     } catch (error) {
       console.error('Logout failed', error);

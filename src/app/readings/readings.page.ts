@@ -4,8 +4,9 @@ import { BooksService } from '../services/books.service';
 import { Book } from '../models/book';
 import { Reading, StatusEnum } from '../models/reading';
 import { getAuth } from 'firebase/auth';
-import { combineLatest, switchMap } from 'rxjs';
+import { catchError, combineLatest, map, of, switchMap } from 'rxjs';
 import { AlertController, ToastController } from '@ionic/angular';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-readings',
@@ -17,54 +18,75 @@ export class ReadingsPage implements OnInit {
   books: Book[] = [];
   myread: Reading[]=[];
   StatusEnum = StatusEnum;
+  userId: string | null = null;
 
   constructor(
     private readingService: ReadingService,
     private bookService: BooksService,
     private alertController: AlertController,
     private toastController: ToastController,
+    private authService: AuthService,
   ) {}
 
-  ngOnInit() {
-  const userId = getAuth().currentUser?.uid;
-  if (!userId) return;
-
-  this.readingService.getReadingsForUser(userId).pipe(
-    switchMap((readings: Reading[]) => {
-      this.myread = readings; 
-      if (readings.length === 0) {
-        return [];
-      }
-      const bookObservables = readings.map(r => this.bookService.getBookById(r.BookId));
-      return combineLatest(bookObservables);
-    })
-  ).subscribe({
-    next: (books: Book[]) => {
-      this.books = books;
-    },
-    error: (error) => {
-      console.error('Error fetching books:', error);
+ ngOnInit() {
+ const storedUser = localStorage.getItem('userData');
+  if (storedUser) {
+    try {
+      const parsedUser = JSON.parse(storedUser);
+      this.userId = parsedUser.id || null;
+    } catch (e) {
+      console.error('Greška pri parsiranju localStorage user-a:', e);
     }
+  }
+
+   this.authService.user$.subscribe(user => {
+    if (user) {
+      this.userId = user.id;
+      localStorage.setItem('userData', JSON.stringify(user));
+    }
+
+    if (!this.userId) {
+      return;
+    }
+
+    this.readingService.getReadingsForUser(this.userId).subscribe();
+
+    this.readingService.getReadingsStream().subscribe(readings => {
+      this.myread = readings;
+
+      if (readings.length === 0) {
+        this.books = [];
+        return;
+      }
+
+      const bookObservables = readings.map(r =>
+        this.bookService.getBookById(r.bookId).pipe(
+          catchError(() => of(null))
+        )
+      );
+
+      combineLatest(bookObservables).subscribe(books => {
+        this.books = books.filter((b): b is Book => b !== null);
+      });
+    });
   });
 }
 
+
   getRatingForBook(bookId: string): number {
-    const reading = this.myread.find(b => b.BookId === bookId);
-    return reading ? reading.Grade : 0; 
+    const reading = this.myread.find(b => b.bookId === bookId);
+    return reading ? reading.grade : 0; 
   }
 
 deleteReading(bookId: string) {
-  const userId = getAuth().currentUser?.uid;
-  if (!userId) return;
-
-  const reading = this.myread.find(r => r.BookId === bookId);
+ const reading = this.myread.find(r => r.bookId === bookId);
   if (!reading) return;
 
-  this.readingService.deleteReading(reading.Id).subscribe({
+ this.readingService.deleteReading(reading.id).subscribe({
     next: () => {
       console.log('Reading deleted');
-      this.myread = this.myread.filter(r => r.BookId !== bookId);
-      this.books = this.books.filter(b => b.Id !== bookId);
+      this.myread = this.myread.filter(r => r.bookId !== bookId);
+      this.books = this.books.filter(b => b.id !== bookId);
     },
     error: (err) => console.error('Error deleting reading', err)
   });
@@ -100,7 +122,7 @@ async presentToast(message: string, color: 'success' | 'danger' = 'success') {
 }
 
 async openImpressionDialog(bookId: string) {
-  const reading = this.myread.find(r => r.BookId === bookId);
+  const reading = this.myread.find(r => r.bookId === bookId);
   if (!reading) return;
 
   const alert = await this.alertController.create({
@@ -110,13 +132,13 @@ async openImpressionDialog(bookId: string) {
         name: 'rating',
         type: 'text',
         placeholder: 'Enter your rating (1–5)',
-        value: reading.Grade > 1 ? reading.Grade.toString() : ''
+        value: reading.grade > 1 ? reading.grade.toString() : ''
       },
       {
         name: 'comment',
         type: 'textarea',
         placeholder: 'Share your thoughts...',
-        value: reading.Comment || ''
+        value: reading.comment || ''
       }
     ],
     buttons: [
@@ -139,11 +161,11 @@ async openImpressionDialog(bookId: string) {
 saveImpression(reading: Reading, rating: number, comment: string) {
   this.readingService.updateRatingAndComment(reading, rating, comment).subscribe({
     next: () => {
-      reading.Grade = rating;
-      reading.Comment = comment;
+      reading.grade = rating;
+      reading.comment = comment;
       if (rating > 0 && comment.trim() !== '') {
-        this.readingService.updateStatus(reading.Id, StatusEnum.Finished).subscribe(() => {
-          reading.Status = StatusEnum.Finished;
+        this.readingService.updateStatus(reading.id, StatusEnum.Finished).subscribe(() => {
+          reading.status = StatusEnum.Finished;
           this.presentToast('Saved your impression!');
         });
       } else {
