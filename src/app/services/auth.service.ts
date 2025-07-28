@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { User } from '../models/user';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 
 interface AuthResponseData {
@@ -144,9 +144,9 @@ export class AuthService {
       switchMap(authData => {
         const tempExpirationDate = new Date(new Date().getTime() + +authData.expiresIn * 1000);
         const tempUser = new User('', '', authData.localId, authData.email, authData.idToken, tempExpirationDate);
-        this.userSubject.next(tempUser); // Emituj privremenog korisnika da bi getToken() imao token
+        this.userSubject.next(tempUser); 
 
-        return this.getUserProfile(authData.localId).pipe(
+        return this.getUserProfile(authData.localId, authData.idToken).pipe(
           map(profileUser => {
             this.handleAuthentication(
               profileUser.firstName,
@@ -205,11 +205,6 @@ export class AuthService {
     this.tokenExpirationTimer = null;
   }
 
-  // getToken(): string | null {
-  //   const user = this.userSubject.getValue();
-  //   if (user) return user.token;
-  //   return null;
-  // }
   getToken(): string | null {
   const userDataString = localStorage.getItem('userData');
   if (!userDataString) return null;
@@ -228,8 +223,8 @@ export class AuthService {
     return null;
   }
 
-  getUserProfile(uid: string): Observable<User> {
-    const idToken = this.getToken(); 
+  getUserProfile(uid: string, token?: string): Observable<User> {
+    const idToken =token ||  this.getToken(); 
     if (!idToken) {
         return throwError(() => new Error('Authentication token is missing. User not authenticated.'));
     }

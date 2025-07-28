@@ -93,10 +93,10 @@ async openAddBookDialog() {
   const alert = await this.alertController.create({
     header: 'Add New Book',
     inputs: [
-      { name: 'title', type: 'text', placeholder: 'Title' },
-      { name: 'author', type: 'text', placeholder: 'Author' },
-      { name: 'description', type: 'textarea', placeholder: 'Description' },
-      { name: 'year', type: 'number', placeholder: 'Published Year', min: 0 }
+      { name: 'title', type: 'text', placeholder: 'Title', attributes: { autocomplete: 'off' }  },
+      { name: 'author', type: 'text', placeholder: 'Author', attributes: { autocomplete: 'off' }  },
+      { name: 'description', type: 'textarea', placeholder: 'Description', attributes: { autocomplete: 'off' }  },
+      { name: 'year', type: 'number', placeholder: 'Published Year', min: 0, attributes: { autocomplete: 'off' }  }
     ],
     buttons: [
       { text: 'Cancel', role: 'cancel' },
@@ -152,11 +152,27 @@ toggleSearch() {
   }
 
   filterBooks() {
+    //ovako ne mozes da ukucas vise reci u search!! tj mozes da ukucas ali ne filtrira kako trebs
+    
+    // const term = this.searchTerm.toLowerCase().trim();
+    // this.filteredBooks = this.allBooks.filter(book =>{
+    //   const words = book.title.toLowerCase().split(' ');
+    // return words.some(word => word.startsWith(term));
+    // });
+    
     const term = this.searchTerm.toLowerCase().trim();
-    this.filteredBooks = this.allBooks.filter(book =>{
-      const words = book.title.toLowerCase().split(' ');
-    return words.some(word => word.startsWith(term));
+  if (!term) {
+    this.filteredBooks = this.allBooks;
+    return;
+  }
+  const searchParts = term.split(' ').filter(Boolean); 
+  this.filteredBooks = this.allBooks.filter(book => {
+  const titleParts = book.title.toLowerCase().split(' '); 
+  return searchParts.every(searchWord => 
+    titleParts.some(titleWord => titleWord.startsWith(searchWord))
+    );
   });
+
   }
 async showToast(message: string, color: 'success' | 'danger' = 'success') {
   const toast = await this.toastController.create({
@@ -190,10 +206,7 @@ validateBookData(data: any): string | null {
 
   return null;
 }
-// getBookById(bookId: string): Observable<Book> {
-//   const params = new HttpParams().set('auth', this.authService.getToken() || '');
-//   return this.http.get<Book>(`${this.baseUrl}/${bookId}.json`, { params });
-// }
+
 
 
 

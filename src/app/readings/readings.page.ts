@@ -132,13 +132,15 @@ async openImpressionDialog(bookId: string) {
         name: 'rating',
         type: 'text',
         placeholder: 'Enter your rating (1–5)',
-        value: reading.grade > 1 ? reading.grade.toString() : ''
+        value: reading.grade > 1 ? reading.grade.toString() : '',
+        attributes: { autocomplete: 'off' }
       },
       {
         name: 'comment',
         type: 'textarea',
         placeholder: 'Share your thoughts...',
-        value: reading.comment || ''
+        value: reading.comment || '',
+        attributes: { autocomplete: 'off' }
       }
     ],
     buttons: [

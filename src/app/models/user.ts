@@ -4,7 +4,6 @@ export class User {
     public lastName: string  = "",
     public email: string  = "",
     public id: string = "",
-    //public password: string  = "",
     private _token: string,
     private tokenExpirationDate: Date | null
   ) {}

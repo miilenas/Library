@@ -37,14 +37,15 @@ async presentToast(message: string) {
    async login() {
     this.errorMessage = null;
   
-  if (this.password.length < 5) {
-    this.presentToast('Password must be at least 5 characters long.');
-    return;
-  }
+  
       if (!this.email || !this.password) {
      this.presentToast ('Email and password are required.');
     return;
     }
+    if (this.password.length < 5) {
+    this.presentToast('Password must be at least 5 characters long.');
+    return;
+  }
 
     try {
       const userData = {
