@@ -201,7 +201,25 @@ validateImpression(rating: any, comment: string): boolean {
   return true;
 }
 
+showFinished: boolean = false;
 
+get filteredBooks(): Book[] {
+  if (this.showFinished) {
+    return this.books.filter(b => {
+      const reading = this.myread.find(r => r.bookId === b.id);
+      return reading && reading.status === StatusEnum.Finished;
+    });
+  } else {
+    return this.books.filter(b => {
+      const reading = this.myread.find(r => r.bookId === b.id);
+      return !reading || reading.status !== StatusEnum.Finished;
+    });
+  }
+}
+
+toggleView() {
+  this.showFinished = !this.showFinished;
+}
 
 
 

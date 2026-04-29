@@ -14,7 +14,7 @@ import { AlertController, ToastController } from '@ionic/angular';
   standalone:false
 })
 export class BooksPage implements OnInit {
-
+  isAdmin: boolean = false;
   books$: Observable<Book[]> | undefined;
   noBooks: boolean = false;
   userId: string | null = null;
@@ -33,6 +33,10 @@ export class BooksPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.authService.isAdmin$.subscribe(admin => {
+    this.isAdmin = admin;
+    console.log('isAdmin u book.page.ts:', admin)
+    });
      this.authService.user$.subscribe(user => {
       if (user) {
       this.userId =  user.id;
@@ -57,6 +61,10 @@ export class BooksPage implements OnInit {
     }
   });
 
+
+
+  
+
     this.books$ = this.booksService.getBooks();
     this.books$.subscribe(books => {
       this.allBooks = books;
@@ -64,13 +72,25 @@ export class BooksPage implements OnInit {
       this.noBooks = books.length === 0;
     });
   }
+// loadReadings() {
+//   if (this.userId) {
+//     this.readingService.getReadingsForUser(this.userId).subscribe(readings => {
+//       this.readings = readings;
+//     });
+//   }
+// }
+
 loadReadings() {
   if (this.userId) {
-    this.readingService.getReadingsForUser(this.userId).subscribe(readings => {
-      this.readings = readings;
+    this.readingService.getReadingsForUser(this.userId).subscribe();
+
+  this.readingService.readings$.subscribe(rr => {
+      this.readings = rr;
     });
+
   }
 }
+
  addBookToReadings(bookId: string) {
   if (this.userId) {
       if (this.readings.find(r => r.bookId === bookId)) {

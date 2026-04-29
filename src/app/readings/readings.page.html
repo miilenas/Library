@@ -1,13 +1,18 @@
 <ion-header class="custom-header" [translucent]="true">
   <ion-toolbar>
     <ion-title>My Readings</ion-title>
+   
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
 
-  <ng-container *ngIf="books.length > 0; else noBooksTemplate">
-    <ion-card *ngFor="let book of books" class="custom-card">
+  <ion-button color="danger" style="margin: 0 auto; display: block; width: 40%;" (click)="toggleView()">
+    {{ showFinished ? 'Show unread' : 'Show finished' }}
+  </ion-button>
+
+  <ng-container *ngIf="filteredBooks.length > 0; else noBooksTemplate">
+  <ion-card *ngFor="let book of filteredBooks" class="custom-card">
       <ion-card-header>
         <ion-card-title>{{ book.title }}</ion-card-title>
         <ion-card-subtitle>{{ book.author }} — {{ book.publishedYear }}</ion-card-subtitle>
@@ -44,7 +49,7 @@
 <ion-alert
   [trigger]="'delete-alert-' + book.id"
   header="Confirm Delete"
-  message="Are you sure you want to remove this book from your list?"
+  message="Are you sure you want to remove this book from your reading list?"
   [buttons]="getAlertButtons(book.id)"
   (didDismiss)="setResult($event)">
 </ion-alert>

@@ -15,14 +15,20 @@ interface AuthResponseData {
 interface UserData {
   firstName?: string,
   lastName?: string,
-  email: string;
-  password: string;
+  email: string,
+  password: string,
+  isAdmin?: boolean,
 }
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+
+  private isAdminSubject = new BehaviorSubject<boolean>(false);
+  isAdmin$ = this.isAdminSubject.asObservable();
+
   private _isUserAuthenticated = false;
   private userSubject = new BehaviorSubject<User | null>(null);
   user$ = this.userSubject.asObservable();
@@ -43,9 +49,10 @@ export class AuthService {
         userData.email || '',
         userData.id || '',
         userData._token || '',
-        userData.tokenExpirationDate ? new Date(userData.tokenExpirationDate) : null
+        userData.tokenExpirationDate ? new Date(userData.tokenExpirationDate) : null,
       );
       this.userSubject.next(loadedUser);
+      this.isAdminSubject.next(userData.isAdmin === true);
     } catch (e) {
       console.error('Error loading user from localStorage:', e);
     }
@@ -68,12 +75,14 @@ export class AuthService {
     userId: string,
     token: string,
     expiresIn: number,
-  ) {
+    isAdmin: boolean = false,
+  ) 
+  {
     const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
     const user = new User(firstName, lastName, email, userId, token, expirationDate);
     this.userSubject.next(user);
     this._isUserAuthenticated = true;
-    localStorage.setItem('userData', JSON.stringify(user)); 
+    localStorage.setItem('userData', JSON.stringify({ ...user, isAdmin })); 
     this.autoLogout(expiresIn * 1000); 
   }
 
@@ -155,6 +164,7 @@ export class AuthService {
               authData.localId,
               authData.idToken,
               +authData.expiresIn,
+              this.isAdminSubject.getValue() 
             );
             return this.userSubject.getValue()!; 
           }),
@@ -229,11 +239,21 @@ export class AuthService {
         return throwError(() => new Error('Authentication token is missing. User not authenticated.'));
     }
 
-    return this.http.get<{firstName?: string, lastName?: string, email?: string}>( 
+    return this.http.get<{firstName?: string, lastName?: string, email?: string, isAdmin?:boolean}>( 
         `https://${environment.firebaseRDBUrl}/users/${uid}.json?auth=${idToken}`
     ).pipe(
         map(profileData => {
             let currentUser = this.userSubject.getValue();
+           this.isAdminSubject.next(profileData?.isAdmin === true);
+            console.log('profileData:', profileData);
+            console.log('isAdmin value:', profileData?.isAdmin);
+
+              const userDataString = localStorage.getItem('userData');
+              if (userDataString) {
+                const userData = JSON.parse(userDataString);
+                userData.isAdmin = profileData?.isAdmin === true;
+                localStorage.setItem('userData', JSON.stringify(userData));
+              }
 
             if (currentUser) {
                 currentUser.firstName = profileData?.firstName || '';
@@ -258,4 +278,28 @@ export class AuthService {
         })
     );
   }
+getIsAdmin(): boolean {
+  return this.isAdminSubject.getValue();
+}
+
+makeAdmin(email: string): Observable<any> {
+  const token = this.getToken();
+  if (!token) return throwError(() => new Error('Not authenticated'));
+
+  return this.http.get<any>(
+    `https://${environment.firebaseRDBUrl}/users.json?auth=${token}`
+  ).pipe(
+    switchMap(users => {
+      const uid = Object.keys(users).find(key => users[key].email === email);
+      if (!uid) return throwError(() => new Error('User not found'));
+
+      return this.http.patch(
+        `https://${environment.firebaseRDBUrl}/users/${uid}.json?auth=${token}`,
+        { isAdmin: true }
+      );
+    })
+  );
+}
+
+
 }

@@ -4,17 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<!-- <ion-content class="ion-padding">
-  <ng-container *ngIf="userProfile$ | async as profile; else loading">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>{{ profile.firstName }} {{ profile.lastName }}</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <p><strong>Email:</strong> {{ profile.email }}</p>
-      </ion-card-content>
-    </ion-card>
-  </ng-container> -->
+
 
   <ion-content class="ion-padding">
   <ng-container *ngIf="userProfile$ | async as profile; else loading">
@@ -24,20 +14,6 @@
 
       <h2 class="full-name">{{ profile.firstName }} {{ profile.lastName }}</h2>
 
-      <!-- <div class="info-row">
-        <strong>First name:</strong>
-        <p>{{ profile.firstName }}</p>
-      </div>
-
-      <div class="info-row">
-        <strong>Last name:</strong>
-        <p>{{ profile.lastName }}</p>
-      </div>
-
-      <div class="info-row">
-        <strong>Email:</strong>
-        <p>{{ profile.email }}</p>
-      </div> -->
  </div>
 
   <ion-list class="custom-list" [inset]="true">
@@ -58,11 +34,15 @@
     </ion-item>
   </ion-list>
 
+<div style="display: flex; justify-content: center;">
+  <ion-button color="danger" *ngIf="isAdmin" routerLink="/tabs/admin">Make Admin</ion-button>
+</div> 
+
 <ion-button expand="block" fill="clear" (click)="logout()" class="logout-button">
   <ion-icon name="log-out-outline" slot="icon-only"  color="danger"></ion-icon>
 </ion-button>
 
-   
+ 
   </ng-container>
 
   <ng-template #loading>

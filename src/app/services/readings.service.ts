@@ -1,4 +1,4 @@
-import {Injectable } from '@angular/core';import {BehaviorSubject, map, Observable, of, switchMap, take } from 'rxjs';
+import {Injectable } from '@angular/core';import {BehaviorSubject, map, Observable, of, Subject, switchMap, take, tap } from 'rxjs';
 import { Reading, StatusEnum } from '../models/reading';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
@@ -100,11 +100,25 @@ addBookToReadings(userId: string, bookId: string): Observable<Reading> {
     return this.updateReading(readingId, { status });
   }
 
-  deleteReading(readingId: string): Observable<void> {
-    return this.http.delete<void>(`https://${environment.firebaseRDBUrl}/readings/${readingId}.json`, {
-      params: this.getAuthParams()
-    });
-  }
+  // deleteReading(readingId: string): Observable<void> {
+  //   return this.http.delete<void>(`https://${environment.firebaseRDBUrl}/readings/${readingId}.json`, {
+  //     params: this.getAuthParams()
+  //   });
+  // }
+
+   readingsChanged$ = new Subject<void>();
+   
+   deleteReading(readingId: string): Observable<any> {
+  return this.http.delete(`https://${environment.firebaseRDBUrl}/readings/${readingId}.json`, {
+    params: this.getAuthParams()
+  }).pipe(
+    tap(() => {
+      const current = this.readingsSubject.getValue();
+      this.readingsSubject.next(current.filter(r => r.id !== readingId));
+      this.readingsChanged$.next();
+    })
+  );
+}
 
   updateRatingAndComment(reading: Reading, rating: number, comment: string): Observable<void> {
     return this.updateReading(reading.id, {

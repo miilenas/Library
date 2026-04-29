@@ -14,11 +14,15 @@ export class ProfilePage implements OnInit {
 
    userProfile$!: Observable<User | null>;
    userId: string | null = null;
+   isAdmin: boolean = false;
 
   constructor(private authService: AuthService, private navCtrl: NavController) { }
   
 
 ngOnInit() {
+   this.authService.isAdmin$.subscribe(admin => {
+    this.isAdmin = admin;
+  });
   const storedUser = localStorage.getItem('userData');
   if (storedUser) {
     try {

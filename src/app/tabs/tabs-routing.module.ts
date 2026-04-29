@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { AdminGuard } from '../guards/admin.guard';
+import { AuthGuard } from '../guards/auth.guard';
 
 const routes: Routes = [
   {
@@ -9,21 +11,29 @@ const routes: Routes = [
     children: [
       {
         path: 'readings',
-        loadChildren: () => import('../readings/readings.module').then(m => m.ReadingsPageModule)
+        loadChildren: () => import('../readings/readings.module').then(m => m.ReadingsPageModule),
+        canActivate: [AuthGuard]
       },
       {
         path: 'books',
-        loadChildren: () => import('../books/books.module').then(m => m.BooksPageModule)
+        loadChildren: () => import('../books/books.module').then(m => m.BooksPageModule),
+        canActivate: [AuthGuard]
       },
        {
         path: 'profile',
-        loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule)
+        loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule),
+        canActivate: [AuthGuard]
       },
-      {
-        path: '',
-        redirectTo: 'readings',
-        pathMatch: 'full'
-      }
+        {
+    path: 'admin',
+    loadChildren: () => import('../admin/admin.module').then(m => m.AdminPageModule),
+    canActivate: [AdminGuard]
+  },
+      // {
+      //   path: '',
+      //   redirectTo: 'readings',
+      //   pathMatch: 'full'
+      // }
     ]
   },
   {
