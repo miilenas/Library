@@ -33,6 +33,10 @@ export class BooksPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    const userId = this.authService.getUserId();
+  if (userId) {
+    this.authService.getUserProfile(userId).subscribe(); 
+  }
     this.authService.isAdmin$.subscribe(admin => {
     this.isAdmin = admin;
     console.log('isAdmin u book.page.ts:', admin)
@@ -40,7 +44,8 @@ export class BooksPage implements OnInit {
      this.authService.user$.subscribe(user => {
       if (user) {
       this.userId =  user.id;
-      localStorage.setItem('userData', JSON.stringify(user));
+      
+      //localStorage.setItem('userData', JSON.stringify(user));
       this.loadReadings();
       }else{
       const storedUser = localStorage.getItem('userData');

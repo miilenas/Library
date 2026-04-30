@@ -208,6 +208,7 @@ export class AuthService {
   logout() {
     this.userSubject.next(null);
     this._isUserAuthenticated = false;
+    this.isAdminSubject.next(false)
     localStorage.removeItem('userData'); 
     if (this.tokenExpirationTimer) {
       clearTimeout(this.tokenExpirationTimer); 

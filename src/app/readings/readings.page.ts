@@ -29,6 +29,10 @@ export class ReadingsPage implements OnInit {
   ) {}
 
  ngOnInit() {
+   const userId = this.authService.getUserId();
+  if (userId) {
+    this.authService.getUserProfile(userId).subscribe();
+  }
  const storedUser = localStorage.getItem('userData');
   if (storedUser) {
     try {
@@ -42,7 +46,7 @@ export class ReadingsPage implements OnInit {
    this.authService.user$.subscribe(user => {
     if (user) {
       this.userId = user.id;
-      localStorage.setItem('userData', JSON.stringify(user));
+      //localStorage.setItem('userData', JSON.stringify(user));
     }
 
     if (!this.userId) {
