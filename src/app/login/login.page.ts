@@ -53,7 +53,7 @@ async presentToast(message: string) {
         password: this.password
       };
       await firstValueFrom(this.authService.login(userData));
-      this.router.navigateByUrl('/tabs/books', { replaceUrl: true }); 
+      this.router.navigateByUrl('/tabs/profile', { replaceUrl: true }); 
     } catch (error: any) {
       
        const firebaseError =error?.message; 
