@@ -100,12 +100,6 @@ addBookToReadings(userId: string, bookId: string): Observable<Reading> {
     return this.updateReading(readingId, { status });
   }
 
-  // deleteReading(readingId: string): Observable<void> {
-  //   return this.http.delete<void>(`https://${environment.firebaseRDBUrl}/readings/${readingId}.json`, {
-  //     params: this.getAuthParams()
-  //   });
-  // }
-
    readingsChanged$ = new Subject<void>();
    
    deleteReading(readingId: string): Observable<any> {
@@ -141,8 +135,38 @@ addReading(userId: string, bookId: string, status: string, grade: string, commen
   );
 }
 
+getReviewsForBook(bookId: string) {
+  return this.getAllReadings().pipe(
+    map(readings =>
+      readings.filter(r =>
+        r.bookId === bookId &&
+        r.status === StatusEnum.Finished &&
+        r.grade > 0 &&
+        r.comment.trim() !== ''
+      )
+    )
+  );
+}
 
-
+getAllReadings(): Observable<Reading[]> {
+  return this.http.get<{ [key: string]: any }>(
+    `https://${environment.firebaseRDBUrl}/readings.json`,
+    { params: this.getAuthParams() }
+  ).pipe(
+    map(responseData => {
+      return !responseData
+        ? []
+        : Object.entries(responseData).map(([id, data]: [string, any]) => ({
+            id,
+            userId: data.userId,
+            bookId: data.bookId,
+            status: data.status as StatusEnum,
+            grade: Number(data.grade),
+            comment: data.comment || ''
+          }));
+    })
+  );
+}
 
 
 

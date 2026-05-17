@@ -39,6 +39,9 @@ export const routes: Routes = [
     path:'first',
     loadChildren: ()=>import('./firstPage/first.module').then(m=>m.FirstPageModule)
   },
+ 
+  
+
   
 
 

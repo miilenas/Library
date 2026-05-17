@@ -1,7 +1,8 @@
 <ion-header class="custom-header" [translucent]="true">
   <ion-toolbar>
-    <ion-title>My Readings</ion-title>
-   
+    <ion-title>
+      {{ showFinished ? 'My Finished' : 'My List' }}
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -29,13 +30,29 @@
     </div>
 
 <div class="actions-row">
-  <ion-button
+  <!-- <ion-button
     fill="clear"
     color="medium"
     size="small"
     (click)="openImpressionDialog(book.id)">
-    <ion-icon slot="icon-only" name="create-outline" size="large"></ion-icon>
-  </ion-button>
+    <ion-icon slot="icon-only" name="checkmark-circle-outline" size="large" color="success" ></ion-icon>
+  </ion-button> -->
+
+  <ion-button
+  *ngIf="getReadingStatus(book.id) !== StatusEnum.Finished"
+  fill="clear"
+  color="medium"
+  size="small"
+  (click)="openImpressionDialog(book.id)">
+  <ion-icon
+    slot="icon-only"
+    name="checkmark-circle-outline"
+    size="large"
+    color="success">
+  </ion-icon>
+</ion-button>
+
+
 
   <ion-button 
     fill="clear" 

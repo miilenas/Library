@@ -15,6 +15,7 @@ import { AuthService } from '../services/auth.service';
   standalone: false,
 })
 export class ReadingsPage implements OnInit {
+
   books: Book[] = [];
   myread: Reading[]=[];
   StatusEnum = StatusEnum;
@@ -125,10 +126,88 @@ async presentToast(message: string, color: 'success' | 'danger' = 'success') {
   await toast.present();
 }
 
+// async openImpressionDialog(bookId: string) {
+//   const reading = this.myread.find(r => r.bookId === bookId);
+//   if (!reading) return;
+
+//   const alert = await this.alertController.create({
+//     header: 'Your impression',
+//     inputs: [
+//       {
+//         name: 'rating',
+//         type: 'text',
+//         placeholder: 'Enter your rating (1–5)',
+//         value: reading.grade > 1 ? reading.grade.toString() : '',
+//         attributes: { autocomplete: 'off' }
+//       },
+//       {
+//         name: 'comment',
+//         type: 'textarea',
+//         placeholder: 'Share your thoughts...',
+//         value: reading.comment || '',
+//         attributes: { autocomplete: 'off' }
+//       }
+//     ],
+//     buttons: [
+//       { text: 'Cancel', role: 'cancel' },
+//       {
+//         text: 'Save',
+//         handler: (data) => {
+//           if (this.validateImpression(data.rating, data.comment)) {
+//     this.saveImpression(reading, parseInt(data.rating), data.comment);
+//     return true; 
+//   }
+//   return false;
+//         }
+//       }
+//     ]
+//   });
+
+//   await alert.present();
+// }
+
 async openImpressionDialog(bookId: string) {
   const reading = this.myread.find(r => r.bookId === bookId);
   if (!reading) return;
 
+  const confirmAlert = await this.alertController.create({
+    header: 'Add review?',
+    message: 'Do you want to add a review for this book?',
+    buttons: [
+      {
+        text: 'Yes',
+        handler: () => {
+          this.openReviewForm(reading);
+        }
+      },
+      {
+        text: 'No',
+        handler: () => {
+          this.markAsFinished(reading);
+        }
+      },
+         {
+        text: 'Cancel',
+        role: 'cancel'
+      }
+    ]
+  });
+
+  await confirmAlert.present();
+}
+markAsFinished(reading: Reading) {
+  this.readingService.updateStatus(reading.id, StatusEnum.Finished).subscribe({
+    next: () => {
+      reading.status = StatusEnum.Finished;
+      this.presentToast('Book marked as finished!');
+    },
+    error: (err) => {
+      console.error('Error updating status:', err);
+      this.presentToast('Error updating status.', 'danger');
+    }
+  });
+}
+async openReviewForm(reading: any) {
   const alert = await this.alertController.create({
     header: 'Your impression',
     inputs: [
@@ -153,10 +232,10 @@ async openImpressionDialog(bookId: string) {
         text: 'Save',
         handler: (data) => {
           if (this.validateImpression(data.rating, data.comment)) {
-    this.saveImpression(reading, parseInt(data.rating), data.comment);
-    return true; 
-  }
-  return false;
+            this.saveImpression(reading, parseInt(data.rating), data.comment);
+            return true;
+          }
+          return false;
         }
       }
     ]
@@ -164,6 +243,13 @@ async openImpressionDialog(bookId: string) {
 
   await alert.present();
 }
+
+getReadingStatus(bookId: string): StatusEnum | undefined {
+  return this.myread.find(r => r.bookId === bookId)?.status;
+}
+
+
+
 saveImpression(reading: Reading, rating: number, comment: string) {
   this.readingService.updateRatingAndComment(reading, rating, comment).subscribe({
     next: () => {

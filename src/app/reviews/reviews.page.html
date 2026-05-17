@@ -1,0 +1,38 @@
+<ion-header class="custom-header" [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back-outline" color="danger"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Reviews</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h2 style="text-align: center;
+   font-weight: bold;
+  font-size: 22px;
+  color: #443627;
+  font-style: italic;
+   margin-bottom: 16px;">
+   {{ bookTitle }}
+   <span style="color:#443627; font-size: 0.8em;">
+      <ion-icon name="star-outline"></ion-icon>{{ averageGrade }}
+    </span>
+  </h2>
+
+  <ion-card *ngFor="let review of reviews">
+    <ion-card-content class="custom-card">
+      Grade: {{ review.grade }}/5
+      <br>
+      Comment: {{ review.comment }}
+    </ion-card-content>
+  </ion-card>
+
+  <ion-text *ngIf="reviews.length === 0">
+    <p>No reviews yet for this book.</p>
+  </ion-text>
+
+</ion-content>

@@ -29,11 +29,12 @@ const routes: Routes = [
     loadChildren: () => import('../admin/admin.module').then(m => m.AdminPageModule),
     canActivate: [AdminGuard]
   },
-      // {
-      //   path: '',
-      //   redirectTo: 'readings',
-      //   pathMatch: 'full'
-      // }
+   {
+        path: 'reviews/:bookId',
+        loadChildren: () => import('../reviews/reviews.module').then(m => m.ReviewsPageModule),
+        canActivate: [AuthGuard]
+      },
+      
     ]
   },
   {

@@ -6,6 +6,7 @@ import { AuthService } from '../services/auth.service';
 import { ReadingService } from '../services/readings.service';
 import { Reading } from '../models/reading';
 import { AlertController, ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-books',
@@ -24,6 +25,8 @@ export class BooksPage implements OnInit {
   filteredBooks: Book[] = [];
   searchTerm: string = '';
   constructor(
+
+    private router: Router,
     private booksService: BooksService,
     private readingService: ReadingService,
     private authService: AuthService,
@@ -231,7 +234,9 @@ validateBookData(data: any): string | null {
 
   return null;
 }
-
+openReviews(bookId: string) {
+this.router.navigateByUrl(`/tabs/reviews/${bookId}`);
+}
 
 
 

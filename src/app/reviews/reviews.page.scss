@@ -1,0 +1,20 @@
+ion-content{
+  --background:#ded1c3;
+  background-size: cover;
+}
+.custom-header ion-toolbar {
+  --background: #bcac9b;       
+}
+.custom-header ion-title {
+  font-weight: bold;
+  font-size: 22px;
+  color: #443627;
+  font-style: italic;
+}
+.custom-card {
+  --background: #f5f1ed;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  color: #442c27;
+}
+
